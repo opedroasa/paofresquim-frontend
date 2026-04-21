@@ -1,3 +1,5 @@
+import "./Dashboard.css";
+
 const metricCards = [
   {
     label: "VENDAS HOJE",
