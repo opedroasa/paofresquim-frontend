@@ -1,48 +1,105 @@
-import React from "react";
-
-const CustomerModal = ({ show, onClose, onSave, onChange, formData }) => {
+export default function CustomerModal({
+  show,
+  onClose,
+  onSave,
+  onChange,
+  formData,
+  editing
+}) {
   if (!show) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-form">
-        <form onSubmit={onSave}>
-          <input
-            name="name"
-            placeholder="Nome"
-            value={formData.name}
-            onChange={onChange}
-          />
+    <div className="modal-overlay" role="presentation" onClick={onClose}>
+      <div
+        className="modal-form"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="customer-modal-title"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="modal-header">
+          <h2 id="customer-modal-title">
+            {editing ? "Editar Cliente" : "Novo Cliente"}
+          </h2>
 
-          <input
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={onChange}
-          />
-
-          <input
-            name="phone"
-            placeholder="Telefone"
-            value={formData.phone}
-            onChange={onChange}
-          />
-
-          <input
-            name="cpf"
-            placeholder="CPF"
-            value={formData.cpf}
-            onChange={onChange}
-          />
-
-          <button type="submit">Salvar</button>
-          <button type="button" onClick={onClose}>
-            Cancelar
+          <button
+            type="button"
+            className="modal-close"
+            onClick={onClose}
+            aria-label="Fechar modal"
+          >
+            x
           </button>
+        </div>
+
+        <form className="customer-form" onSubmit={onSave}>
+          <label className="field-full">
+            <span>Nome</span>
+            <input
+              name="name"
+              value={formData.name}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label>
+            <span>Telefone</span>
+            <input
+              name="phone"
+              value={formData.phone}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label>
+            <span>CPF</span>
+            <input
+              name="cpf"
+              value={formData.cpf}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label className="field-full">
+            <span>E-mail</span>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label className="field-full">
+            <span>Endereço</span>
+            <input
+              name="address"
+              value={formData.address}
+              onChange={onChange}
+            />
+          </label>
+
+          <label className="field-full">
+            <span>Observações</span>
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={onChange}
+              rows="3"
+            />
+          </label>
+
+          <div className="modal-actions">
+            <button type="submit" className="save-client-button">
+              Salvar
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
-};
-
-export default CustomerModal;
+}

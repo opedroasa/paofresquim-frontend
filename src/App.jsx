@@ -1,22 +1,8 @@
-import React from "react";
-import Sidebar from "./components/layout/Sidebar";
-import CustomerTable from "./components/customers/CustomerTable";
-import "./index.css";
+import "./App.css";
+import Customers from "./pages/Customers";
 
 function App() {
-  const customers = [];
-
-  return (
-    <div className="app-container">
-      <Sidebar />
-
-      <div className="main-content">
-        <h1>Clientes</h1>
-
-        <CustomerTable customers={customers} />
-      </div>
-    </div>
-  );
+  return <Customers />;
 }
 
 export default App;
