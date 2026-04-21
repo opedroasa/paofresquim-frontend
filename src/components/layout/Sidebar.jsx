@@ -1,12 +1,12 @@
 import logoPaoFresquim from "../../assets/logo-pao-fresquim.jpeg";
 
 const menuItems = [
-  { label: "Dashboard", icon: DashboardIcon },
-  { label: "Caixa (PDV)", icon: CartIcon },
-  { label: "Produtos", icon: BoxIcon },
-  { label: "Clientes", icon: UsersIcon, active: true },
-  { label: "Funcion\u00e1rio", icon: BadgeIcon },
-  { label: "Relat\u00f3rio", icon: ChartIcon }
+  { key: "dashboard", label: "Dashboard", icon: DashboardIcon },
+  { key: "cashier", label: "Caixa (PDV)", icon: CartIcon },
+  { key: "products", label: "Produtos", icon: BoxIcon },
+  { key: "customers", label: "Clientes", icon: UsersIcon },
+  { key: "employees", label: "Funcion\u00e1rio", icon: BadgeIcon },
+  { key: "reports", label: "Relat\u00f3rio", icon: ChartIcon }
 ];
 
 function IconWrapper({ children }) {
@@ -96,7 +96,7 @@ function LogoutIcon() {
   );
 }
 
-export default function Sidebar() {
+export default function Sidebar({ activePage, onNavigate }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
@@ -114,11 +114,12 @@ export default function Sidebar() {
         </div>
 
         <nav className="sidebar-nav" aria-label="Menu principal">
-          {menuItems.map(({ label, icon: Icon, active }) => (
+          {menuItems.map(({ key, label, icon: Icon }) => (
             <button
               key={label}
               type="button"
-              className={`sidebar-link${active ? " is-active" : ""}`}
+              className={`sidebar-link${activePage === key ? " is-active" : ""}`}
+              onClick={() => onNavigate(key === "customers" ? key : "dashboard")}
             >
               <Icon />
               <span>{label}</span>

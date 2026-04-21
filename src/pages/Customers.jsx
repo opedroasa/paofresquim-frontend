@@ -1,7 +1,6 @@
 import { useState } from "react";
 import CustomerModal from "../components/customers/CustomerModal";
 import CustomerTable from "../components/customers/CustomerTable";
-import Sidebar from "../components/layout/Sidebar";
 
 const initialCustomers = [
   {
@@ -108,53 +107,45 @@ export default function Customers() {
   };
 
   return (
-    <div className="page-shell">
-      <div className="bakery-backdrop" aria-hidden="true" />
+    <main className="content-panel">
+      <header className="content-header">
+        <div>
+          <h1>Clientes</h1>
+          <p>{filteredCustomers.length} clientes cadastrados</p>
+        </div>
 
-      <div className="dashboard-frame">
-        <Sidebar />
+        <button
+          type="button"
+          className="primary-action"
+          onClick={openNewCustomerModal}
+        >
+          <span aria-hidden="true">+</span>
+          Novo Cliente
+        </button>
+      </header>
 
-        <main className="content-panel">
-          <header className="content-header">
-            <div>
-              <h1>Clientes</h1>
-              <p>{filteredCustomers.length} clientes cadastrados</p>
-            </div>
+      <section className="toolbar">
+        <label className="searchbox" aria-label="Buscar cliente">
+          <span className="searchbox__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M10.5 4a6.5 6.5 0 1 0 4.03 11.6l4.43 4.43 1.41-1.41-4.43-4.43A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z" />
+            </svg>
+          </span>
 
-            <button
-              type="button"
-              className="primary-action"
-              onClick={openNewCustomerModal}
-            >
-              <span aria-hidden="true">+</span>
-              Novo Cliente
-            </button>
-          </header>
-
-          <section className="toolbar">
-            <label className="searchbox" aria-label="Buscar cliente">
-              <span className="searchbox__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation">
-                  <path d="M10.5 4a6.5 6.5 0 1 0 4.03 11.6l4.43 4.43 1.41-1.41-4.43-4.43A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z" />
-                </svg>
-              </span>
-
-              <input
-                type="search"
-                placeholder="Buscar por nome, telefone ou CPF..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </label>
-          </section>
-
-          <CustomerTable
-            customers={filteredCustomers}
-            onEdit={openEditModal}
-            onDelete={handleDeleteCustomer}
+          <input
+            type="search"
+            placeholder="Buscar por nome, telefone ou CPF..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
           />
-        </main>
-      </div>
+        </label>
+      </section>
+
+      <CustomerTable
+        customers={filteredCustomers}
+        onEdit={openEditModal}
+        onDelete={handleDeleteCustomer}
+      />
 
       <CustomerModal
         show={isModalOpen}
@@ -164,6 +155,6 @@ export default function Customers() {
         formData={formData}
         editing={editingCustomer}
       />
-    </div>
+    </main>
   );
 }
