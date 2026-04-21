@@ -1,8 +1,15 @@
 import "./App.css";
 import { useState } from "react";
 import Sidebar from "./components/layout/Sidebar";
+import Cashier from "./pages/Cashier";
 import Customers from "./pages/Customers";
 import Dashboard from "./pages/Dashboard";
+
+const pages = {
+  dashboard: <Dashboard />,
+  cashier: <Cashier />,
+  customers: <Customers />
+};
 
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
@@ -14,7 +21,7 @@ function App() {
       <div className="dashboard-frame">
         <Sidebar activePage={activePage} onNavigate={setActivePage} />
 
-        {activePage === "dashboard" ? <Dashboard /> : <Customers />}
+        {pages[activePage] ?? pages.dashboard}
       </div>
     </div>
   );

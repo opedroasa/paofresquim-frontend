@@ -119,7 +119,9 @@ export default function Sidebar({ activePage, onNavigate }) {
               key={label}
               type="button"
               className={`sidebar-link${activePage === key ? " is-active" : ""}`}
-              onClick={() => onNavigate(key === "customers" ? key : "dashboard")}
+              onClick={() =>
+                onNavigate(["dashboard", "cashier", "customers"].includes(key) ? key : "dashboard")
+              }
             >
               <Icon />
               <span>{label}</span>
