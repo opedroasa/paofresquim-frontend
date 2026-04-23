@@ -5,8 +5,9 @@ const menuItems = [
   { key: "cashier", label: "Caixa (PDV)", icon: CartIcon },
   { key: "products", label: "Produtos", icon: BoxIcon },
   { key: "customers", label: "Clientes", icon: UsersIcon },
-  { key: "employees", label: "Funcion\u00e1rio", icon: BadgeIcon },
-  { key: "reports", label: "Relat\u00f3rio", icon: ChartIcon }
+  { key: "employees", label: "Funcionário", icon: BadgeIcon },
+  { key: "ponto", label: "Registro de Ponto", icon: BadgeIcon },
+  { key: "reports", label: "Relatório", icon: ChartIcon }
 ];
 
 function IconWrapper({ children }) {
@@ -112,20 +113,17 @@ export default function Sidebar({ activePage, onNavigate }) {
             <span>{"SISTEMA DE GEST\u00c3O"}</span>
           </div>
         </div>
-
         <nav className="sidebar-nav" aria-label="Menu principal">
-          {menuItems.map(({ key, label, icon: Icon }) => (
-            <button
-              key={label}
-              type="button"
-              className={`sidebar-link${activePage === key ? " is-active" : ""}`}
-              onClick={() =>
-                onNavigate(["dashboard", "cashier", "customers"].includes(key) ? key : "dashboard")
-              }
-            >
-              <Icon />
-              <span>{label}</span>
-            </button>
+            {menuItems.map(({ key, label, icon: Icon }) => (
+              <button
+                key={label}
+                type="button"
+                className={`sidebar-link${activePage === key ? " is-active" : ""}`}
+                onClick={() => onNavigate(key)}
+              >
+                <Icon />
+                <span>{label}</span>
+              </button>
           ))}
         </nav>
       </div>

@@ -1,0 +1,183 @@
+.ponto-page {
+  width: 100%;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.ponto-header h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  color: #1f1a17;
+}
+
+.ponto-header p {
+  margin-top: 8px;
+  color: #5f564d;
+  font-size: 1rem;
+}
+
+.ponto-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.ponto-card {
+  background: #f2e2c5;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.ponto-card h2 {
+  margin: 0 0 18px;
+  color: #1f1a17;
+  font-size: 1.2rem;
+}
+
+.ponto-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+}
+
+.ponto-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+  flex: 1;
+}
+
+.ponto-field label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #3a312b;
+}
+
+.ponto-field input {
+  height: 44px;
+  border: 1px solid #d7c3a4;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  background: #fffaf2;
+  outline: none;
+}
+
+.ponto-field input:focus {
+  border-color: #b88a44;
+  box-shadow: 0 0 0 3px rgba(184, 138, 68, 0.15);
+}
+
+.ponto-button {
+  height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 10px;
+  background: #1f1a17;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.ponto-button:hover {
+  background: #332922;
+}
+
+.ponto-message {
+  margin-top: 14px;
+  font-size: 0.95rem;
+  color: #4d3f33;
+}
+
+.ponto-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ponto-summary-box {
+  background: #fff7ea;
+  border: 1px solid #e0ceb0;
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.ponto-summary-box span {
+  display: block;
+  font-size: 0.9rem;
+  color: #6a6056;
+  margin-bottom: 8px;
+}
+
+.ponto-summary-box strong {
+  color: #1f1a17;
+  font-size: 1.1rem;
+}
+
+.ponto-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ponto-table-wrapper {
+  overflow-x: auto;
+}
+
+.ponto-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fffaf2;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ponto-table thead {
+  background: #ead4b0;
+}
+
+.ponto-table th,
+.ponto-table td {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+}
+
+.ponto-table th {
+  color: #2b221d;
+  font-weight: 700;
+}
+
+.ponto-table tbody tr {
+  border-top: 1px solid #eadcc7;
+}
+
+.ponto-table tbody tr:hover {
+  background: #fdf4e6;
+}
+
+.ponto-empty {
+  background: #fff7ea;
+  border: 1px dashed #d3b88c;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  color: #6b6258;
+}
+
+@media (max-width: 960px) {
+  .ponto-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ponto-page {
+    padding: 20px;
+  }
+}

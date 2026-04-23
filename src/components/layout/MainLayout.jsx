@@ -3,11 +3,13 @@ import Sidebar from "./Sidebar";
 import Dashboard from "../../pages/Dashboard";
 import Cashier from "../../pages/Cashier";
 import Customers from "../../pages/Customers";
+import Ponto from "../../pages/Ponto";
 
 const pages = {
   dashboard: <Dashboard />,
   cashier: <Cashier />,
-  customers: <Customers />
+  customers: <Customers />,
+  ponto: <Ponto />
 };
 
 export default function MainLayout() {
