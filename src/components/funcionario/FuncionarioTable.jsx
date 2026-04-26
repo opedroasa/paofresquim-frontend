@@ -18,35 +18,44 @@ function TrashIcon() {
   );
 }
 
-export default function CustomerTable({ customers, onEdit, onDelete }) {
+function formatarMoeda(valor) {
+  return Number(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+export default function FuncionarioTable({ funcionarios, onEdit, onDelete }) {
   return (
-    <section className="customer-card">
-      <div className="customer-table-wrap">
-        <table className="customer-table">
+    <section>
+      <div className="funcionario-table-wrap">
+        <table className="funcionario-table">
           <thead>
             <tr>
               <th>NOME</th>
+              <th>CARGO</th>
               <th>TELEFONE</th>
-              <th>E-MAIL</th>
-              <th>CPF</th>
+              <th>SALÁRIO</th>
+              <th>STATUS</th>
               <th aria-label="Ações" />
             </tr>
           </thead>
 
           <tbody>
-            {customers.length > 0 ? (
-              customers.map((customer) => (
-                <tr key={customer.id}>
-                  <td>{customer.name}</td>
-                  <td>{customer.phone}</td>
-                  <td>{customer.email}</td>
-                  <td>{customer.cpf}</td>
+            {funcionarios.length > 0 ? (
+              funcionarios.map((funcionario) => (
+                <tr key={funcionario.id}>
+                  <td>{funcionario.nome}</td>
+                  <td>{funcionario.cargo}</td>
+                  <td>{funcionario.telefone}</td>
+                  <td>{formatarMoeda(funcionario.salario)}</td>
+                  <td>{funcionario.status}</td>
                   <td className="actions-cell">
                     <button
                       type="button"
                       className="icon-button"
-                      aria-label={`Editar ${customer.name}`}
-                      onClick={() => onEdit(customer)}
+                      aria-label={`Editar ${funcionario.nome}`}
+                      onClick={() => onEdit(funcionario)}
                     >
                       <PencilIcon />
                     </button>
@@ -54,8 +63,8 @@ export default function CustomerTable({ customers, onEdit, onDelete }) {
                     <button
                       type="button"
                       className="icon-button"
-                      aria-label={`Excluir ${customer.name}`}
-                      onClick={() => onDelete(customer.id)}
+                      aria-label={`Excluir ${funcionario.nome}`}
+                      onClick={() => onDelete(funcionario.id)}
                     >
                       <TrashIcon />
                     </button>
@@ -64,8 +73,8 @@ export default function CustomerTable({ customers, onEdit, onDelete }) {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="empty-state">
-                  Nenhum cliente encontrado.
+                <td colSpan="6" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
+                  Nenhum funcionário encontrado.
                 </td>
               </tr>
             )}

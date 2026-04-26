@@ -1,0 +1,65 @@
+/* Funcionario.css */
+/* O container, header, searchbox e botões já herdam do layout global/App.css ou podem reaproveitar. 
+Mas para garantir, repetimos as estruturas chave da tabela e do form para manter a modularidade. */
+
+.funcionario-table-wrap {
+  overflow-x: auto;
+  border-radius: 14px;
+  background: #eab655; /* Fundo ouro escuro do print */
+  box-shadow: inset 0 0 0 1px rgba(112, 71, 24, 0.14);
+}
+
+.funcionario-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.funcionario-table thead th {
+  padding: 18px 26px 16px;
+  background: #f4dbb2; /* Fundo creme do cabeçalho */
+  color: #2c1f12;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.funcionario-table thead th:first-child { border-top-left-radius: 14px; }
+.funcionario-table thead th:last-child { border-top-right-radius: 14px; }
+
+.funcionario-table tbody td {
+  padding: 20px 26px;
+  color: #2d1f11;
+  font-size: 15px;
+  border-top: 1px solid rgba(110, 72, 33, 0.2);
+}
+
+.funcionario-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  row-gap: 15px;
+}
+
+.funcionario-form label {
+  display: grid;
+  gap: 5px;
+}
+
+.funcionario-form label span {
+  color: #1f1408;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.funcionario-form input,
+.funcionario-form select {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  border-radius: 5px;
+  background: #fff6e7;
+  outline: none;
+  color: #1f1408;
+  padding: 0 10px;
+}

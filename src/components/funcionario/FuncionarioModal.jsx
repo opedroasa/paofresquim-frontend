@@ -1,4 +1,4 @@
-export default function CustomerModal({
+export default function FuncionarioModal({
   show,
   onClose,
   onSave,
@@ -14,12 +14,12 @@ export default function CustomerModal({
         className="modal-form"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="customer-modal-title"
+        aria-labelledby="funcionario-modal-title"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="modal-header">
-          <h2 id="customer-modal-title">
-            {editing ? "Editar Cliente" : "Novo Cliente"}
+          <h2 id="funcionario-modal-title">
+            {editing ? "Editar Funcionário" : "Novo Funcionário"}
           </h2>
 
           <button
@@ -32,12 +32,40 @@ export default function CustomerModal({
           </button>
         </div>
 
-        <form className="customer-form" onSubmit={onSave}>
+        <form className="funcionario-form" onSubmit={onSave}>
           <label className="field-full">
             <span>Nome</span>
             <input
-              name="name"
-              value={formData.name}
+              name="nome"
+              value={formData.nome}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label>
+            <span>Cargo</span>
+            <select
+              name="cargo"
+              value={formData.cargo}
+              onChange={onChange}
+              required
+            >
+              <option value="">Selecione...</option>
+              <option value="Gerente">Gerente</option>
+              <option value="Padeiro">Padeiro</option>
+              <option value="Caixa">Caixa</option>
+              <option value="Atendente">Atendente</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Salário</span>
+            <input
+              type="number"
+              step="0.01"
+              name="salario"
+              value={formData.salario}
               onChange={onChange}
               required
             />
@@ -46,24 +74,14 @@ export default function CustomerModal({
           <label>
             <span>Telefone</span>
             <input
-              name="phone"
-              value={formData.phone}
+              name="telefone"
+              value={formData.telefone}
               onChange={onChange}
               required
             />
           </label>
 
           <label>
-            <span>CPF</span>
-            <input
-              name="cpf"
-              value={formData.cpf}
-              onChange={onChange}
-              required
-            />
-          </label>
-
-          <label className="field-full">
             <span>E-mail</span>
             <input
               type="email"
@@ -75,21 +93,13 @@ export default function CustomerModal({
           </label>
 
           <label className="field-full">
-            <span>Endereço</span>
+            <span>Data de Admissão</span>
             <input
-              name="address"
-              value={formData.address}
+              type="date"
+              name="dataAdmissao"
+              value={formData.dataAdmissao}
               onChange={onChange}
-            />
-          </label>
-
-          <label className="field-full">
-            <span>Observações</span>
-            <textarea
-              name="notes"
-              value={formData.notes}
-              onChange={onChange}
-              rows="3"
+              required
             />
           </label>
 
