@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function CustomerForm({ onSave, editing, onCancel }) {
+export default function ClienteForm({ onSave, editing, onCancel }) {
   const [form, setForm] = useState({
     name: "",
     email: "",

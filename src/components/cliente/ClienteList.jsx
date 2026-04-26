@@ -1,7 +1,7 @@
 import { useState } from "react";
-import CustomerForm from "./CustomerForm";
+import ClienteForm from "./ClienteForm";
 
-export default function CustomerList() {
+export default function ClienteList() {
   const [customers, setCustomers] = useState([
     { id: 1, name: "João", email: "joao@email.com", phone: "9999-9999" },
     { id: 2, name: "Maria", email: "maria@email.com", phone: "8888-8888" }

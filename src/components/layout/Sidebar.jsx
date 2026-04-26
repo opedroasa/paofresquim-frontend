@@ -1,13 +1,15 @@
 import logoPaoFresquim from "../../assets/logo-pao-fresquim.jpeg";
+import "./Sidebar.css";
+import { useNavigate } from "react-router-dom";
 
 const menuItems = [
   { key: "dashboard", label: "Dashboard", icon: DashboardIcon },
-  { key: "cashier", label: "Caixa (PDV)", icon: CartIcon },
-  { key: "products", label: "Produtos", icon: BoxIcon },
-  { key: "customers", label: "Clientes", icon: UsersIcon },
-  { key: "employees", label: "Funcionário", icon: BadgeIcon },
+  { key: "caixa", label: "Caixa", icon: CartIcon },
+  { key: "produto", label: "Produtos", icon: BoxIcon },
+  { key: "cliente", label: "Clientes", icon: UsersIcon },
+  { key: "funcionario", label: "Funcionário", icon: BadgeIcon },
   { key: "ponto", label: "Registro de Ponto", icon: BadgeIcon },
-  { key: "reports", label: "Relatório", icon: ChartIcon }
+  { key: "relatorio", label: "Relatório", icon: ChartIcon }
 ];
 
 function IconWrapper({ children }) {
@@ -98,6 +100,12 @@ function LogoutIcon() {
 }
 
 export default function Sidebar({ activePage, onNavigate }) {
+  const navigate = useNavigate(); 
+
+  const fazerLogout = () => {
+    navigate("/"); 
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-top">
@@ -107,11 +115,6 @@ export default function Sidebar({ activePage, onNavigate }) {
             src={logoPaoFresquim}
             alt="Logo Pão Fresquim"
           />
-
-          <div className="brand-copy">
-            <strong>PAOFRESQUIM</strong>
-            <span>{"SISTEMA DE GEST\u00c3O"}</span>
-          </div>
         </div>
         <nav className="sidebar-nav" aria-label="Menu principal">
             {menuItems.map(({ key, label, icon: Icon }) => (
@@ -128,19 +131,25 @@ export default function Sidebar({ activePage, onNavigate }) {
         </nav>
       </div>
 
-      <footer className="sidebar-footer">
-        <div className="profile-card">
-          <div className="profile-avatar">AD</div>
-
-          <div className="profile-copy">
-            <strong>Admin</strong>
-            <span>admin@padaria.com</span>
-          </div>
-
-          <button type="button" className="logout-button" aria-label="Sair">
-            <LogoutIcon />
-          </button>
-        </div>
+<footer className="sidebar-footer">
+        <button 
+          type="button" 
+          className="logout-button" 
+          aria-label="Sair"
+          onClick={fazerLogout}
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            gap: '10px', 
+            width: '100%', 
+            padding: '10px',
+            color: '#ff6b6b'
+          }}
+        >
+          <LogoutIcon />
+          <span style={{ fontSize: '16px', fontWeight: 'bold' }}>Sair</span>
+        </button>
       </footer>
     </aside>
   );

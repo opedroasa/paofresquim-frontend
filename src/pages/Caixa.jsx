@@ -1,14 +1,15 @@
 import { useState } from "react";
+import "./Caixa.css";
 
 const categories = ["Todos", "Paes", "Bolos", "Doces", "Salgados", "Bebidas", "Frios"];
 
 const products = [
-  { id: 1, name: "Pão de Queijo", category: "Paes", price: 0.5 },
-  { id: 2, name: "Pão Francês", category: "Paes", price: 0.25 },
-  { id: 3, name: "Bolo de Chocolate", category: "Bolos", price: 4.5 },
-  { id: 4, name: "Brigadeiro", category: "Doces", price: 1 },
-  { id: 5, name: "Coxinha", category: "Salgados", price: 3.5 },
-  { id: 6, name: "Mussarela", category: "Frios", price: 30 }
+  { id: 1, barcode: "78910", name: "Pão de Queijo", category: "Paes", price: 0.5, favorite: true },
+  { id: 2, barcode: "78911", name: "Pão Francês", category: "Paes", price: 0.25, favorite: true },
+  { id: 3, barcode: "78912", name: "Bolo de Chocolate", category: "Bolos", price: 4.5, favorite: false },
+  { id: 4, barcode: "78913", name: "Brigadeiro", category: "Doces", price: 1, favorite: true },
+  { id: 5, barcode: "78914", name: "Coxinha", category: "Salgados", price: 3.5, favorite: true },
+  { id: 6, barcode: "78915", name: "Mussarela", category: "Frios", price: 30, favorite: false }
 ];
 
 function formatCurrency(value) {
@@ -28,33 +29,68 @@ function CartIcon() {
   );
 }
 
-export default function Cashier() {
+export default function Caixa() {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState([]);
 
   const filteredProducts = products.filter((product) => {
+    if (query.trim() === "" && selectedCategory === "Todos") {
+      return product.favorite;
+    }
+
     const matchesCategory =
       selectedCategory === "Todos" || product.category === selectedCategory;
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(query.trim().toLowerCase());
+    
+    const matchesSearch = 
+      product.name.toLowerCase().includes(query.trim().toLowerCase()) ||
+      product.barcode === query.trim();
 
     return matchesCategory && matchesSearch;
   });
 
-  const addToCart = (product) => {
+  const addToCart = (product, qty = 1) => {
     setCart((current) => {
       const existing = current.find((item) => item.id === product.id);
 
       if (existing) {
         return current.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + qty } : item
         );
       }
 
-      return [...current, { ...product, quantity: 1 }];
+      return [...current, { ...product, quantity: qty }];
     });
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      
+      const searchStr = query.trim().toLowerCase();
+      if (!searchStr) return;
+
+      let qty = 1;
+      let code = searchStr;
+
+      if (searchStr.includes("x")) {
+        const parts = searchStr.split("x");
+        const parsedQty = parseInt(parts[0], 10);
+        if (!isNaN(parsedQty) && parsedQty > 0) {
+          qty = parsedQty;
+          code = parts[1];
+        }
+      }
+
+      const product = products.find(p => p.barcode === code || p.name.toLowerCase() === code);
+
+      if (product) {
+        addToCart(product, qty);
+        setQuery("");
+      } else {
+        alert("Produto não encontrado!");
+      }
+    }
   };
 
   const removeFromCart = (id) => {
@@ -69,9 +105,9 @@ export default function Cashier() {
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <main className="cashier-page">
-      <section className="cashier-products">
-        <header className="cashier-header">
+    <main className="caixa-page">
+      <section className="caixa-products">
+        <header className="caixa-header">
           <h1>Caixa (PDV)</h1>
         </header>
 
@@ -84,7 +120,8 @@ export default function Cashier() {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Buscar produto..."
+            onKeyDown={handleKeyDown}
+            placeholder="Buscar produto ou bipar código de barras..."
             type="search"
           />
         </label>
