@@ -1,6 +1,25 @@
 import "./Produto.css";
 import { useState } from "react";
 
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" role="presentation">
+      <path d="m4 20 4.2-.9L19 8.3 15.7 5 4.9 15.8 4 20Z" />
+      <path d="m13.8 6.8 3.3 3.3" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" role="presentation">
+      <path d="M4 7h16" />
+      <path d="M9 7V4h6v3" />
+      <path d="M7 7l1 12h8l1-12" />
+      <path d="M10 11v5M14 11v5" />
+    </svg>
+  );
+}
 export default function Produtos() {
   const [produtos, setProdutos] = useState([
     { id: 1, nome: "Pão de Queijo", categoria: "Pães", preco: "R$0,50", estoque: 200 },
@@ -61,13 +80,28 @@ export default function Produtos() {
                 <td>{p.preco}</td>
                 <td>{p.estoque}</td>
                 <td className="acoes">
-                  <span className="editar">✏️</span>
-                  <span
-                    className="excluir"
-                    onClick={() => excluirProduto(p.id)}
-                  >
-                    🗑️
-                  </span>
+                  
+                   <button
+                      type="button"
+                      className="icon-button"
+                      aria-label={`Editar ${p.nome}`}
+                      onClick={() => onEdit(p.id)}
+                    >
+                      <PencilIcon />
+                      </button>
+                    
+                    <button
+                      type="button"
+                      className="icon-button"
+                      aria-label={`Excluir ${p.nome}`}
+                      onClick={() => onDelete(p.id)}
+                    >
+                      <TrashIcon />
+                    </button>
+                    
+                
+                    
+                
                 </td>
               </tr>
             ))}
