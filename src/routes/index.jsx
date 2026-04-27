@@ -3,6 +3,7 @@ import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import MainLayout from "../components/layout/MainLayout";
 import Ponto from "../pages/Ponto";
+import Produto from "../pages/Produto";
 
 export default function RoutesApp() {
   return (
@@ -12,6 +13,8 @@ export default function RoutesApp() {
         <Route path="/app" element={<MainLayout />} />
 
         <Route path="/ponto" element={<Ponto />} />
+
+        <Route path="/produto" element={<Produto/>}/>
 
       </Routes>
     </BrowserRouter>
