@@ -20,6 +20,89 @@ function TrashIcon() {
     </svg>
   );
 }
+
+function ProdutoModal({
+  show,
+  editing,
+  formData,
+  onChange,
+  onClose,
+  onSave,
+}) {
+  if (!show) return null;
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-form" onClick={(event) => event.stopPropagation()}>
+        <div className="modal-header">
+          <h2>{editing ? "Editar Produto" : "Novo Produto"}</h2>
+
+          <button type="button" className="modal-close" onClick={onClose}>
+            x
+          </button>
+        </div>
+
+        <form className="produto-form" onSubmit={onSave}>
+          <label className="field-full">
+            <span>Nome do Produto</span>
+            <input
+              name="nome"
+              value={formData.nome}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label>
+            <span>Categoria</span>
+            <select
+              name="categoria"
+              value={formData.categoria}
+              onChange={onChange}
+              required
+            >
+              <option value="">Selecione...</option>
+              <option value="Pães">Pães</option>
+              <option value="Doce">Doce</option>
+              <option value="Frios">Frios</option>
+              <option value="Bolo">Bolo</option>
+              <option value="Salgado">Salgado</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Preço</span>
+            <input
+              name="preco"
+              placeholder="Ex: R$5,00"
+              value={formData.preco}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <label className="field-full">
+            <span>Estoque</span>
+            <input
+              type="number"
+              name="estoque"
+              value={formData.estoque}
+              onChange={onChange}
+              required
+            />
+          </label>
+
+          <div className="modal-actions">
+            <button type="submit" className="save-product-button">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function Produtos() {
   const [produtos, setProdutos] = useState([
     { id: 1, nome: "Pão de Queijo", categoria: "Pães", preco: "R$0,50", estoque: 200 },
@@ -31,6 +114,81 @@ export default function Produtos() {
   ]);
 
   const [busca, setBusca] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
+  const [formData, setFormData] = useState({
+    nome: "",
+    categoria: "",
+    preco: "",
+    estoque: "",
+  });
+
+  const abrirNovoProduto = () => {
+    setEditingId(null);
+    setFormData({
+      nome: "",
+      categoria: "",
+      preco: "",
+      estoque: "",
+    });
+    setShowModal(true);
+  };
+
+  const abrirEditarProduto = (produto) => {
+    setEditingId(produto.id);
+    setFormData({
+      nome: produto.nome,
+      categoria: produto.categoria,
+      preco: produto.preco,
+      estoque: produto.estoque,
+    });
+    setShowModal(true);
+  };
+
+  const fecharModal = () => {
+    setShowModal(false);
+    setEditingId(null);
+  };
+
+  const alterarCampo = (e) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const salvarProduto = (e) => {
+    e.preventDefault();
+
+    if (editingId) {
+      const listaAtualizada = produtos.map((produto) =>
+        produto.id === editingId
+          ? {
+              ...produto,
+              ...formData,
+              estoque: Number(formData.estoque),
+            }
+          : produto
+      );
+
+      setProdutos(listaAtualizada);
+    } else {
+      const novoProduto = {
+        id: Date.now(),
+        nome: formData.nome,
+        categoria: formData.categoria,
+        preco: formData.preco,
+        estoque: Number(formData.estoque),
+      };
+
+      setProdutos([...produtos, novoProduto]);
+    }
+
+    fecharModal();
+  };
 
   const excluirProduto = (id) => {
     const novaLista = produtos.filter((p) => p.id !== id);
@@ -49,8 +207,19 @@ export default function Produtos() {
           <p>Gerencie o catálogo de produtos da padaria</p>
         </div>
 
-        <button className="btn-novo">+ Novo Produto</button>
+        <button className="btn-novo" onClick={abrirNovoProduto}>
+          + Novo Produto
+        </button>
       </div>
+
+        <section className="toolbar">
+        <label className="searchbox" aria-label="Buscar produto">
+          <span className="searchbox__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="presentation">
+              <path d="M10.5 4a6.5 6.5 0 1 0 4.03 11.6l4.43 4.43 1.41-1.41-4.43-4.43A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z" />
+            </svg>
+          </span>
+          
 
       <input
         type="text"
@@ -59,6 +228,8 @@ export default function Produtos() {
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
       />
+      </label>
+       </section>
 
       <div className="tabela-container">
         <table>
@@ -80,34 +251,47 @@ export default function Produtos() {
                 <td>{p.preco}</td>
                 <td>{p.estoque}</td>
                 <td className="acoes">
+                  <button
+                    type="button"
+                    className="icon-button"
+                    onClick={() => abrirEditarProduto(p)}
+                  >
+                    <PencilIcon />
+                  </button>
                   
-                   <button
-                      type="button"
-                      className="icon-button"
-                      aria-label={`Editar ${p.nome}`}
-                      onClick={() => onEdit(p.id)}
-                    >
-                      <PencilIcon />
-                      </button>
+
+                  <button
+                    type="button"
+                    className="icon-button"
+                    onClick={() => excluirProduto(p.id)}
+                  >
+
                     
-                    <button
-                      type="button"
-                      className="icon-button"
-                      aria-label={`Excluir ${p.nome}`}
-                      onClick={() => onDelete(p.id)}
-                    >
-                      <TrashIcon />
-                    </button>
-                    
-                
-                    
-                
+                    <TrashIcon />
+                  </button>
                 </td>
               </tr>
             ))}
+              {produtosFiltrados.length === 0 && (
+  <tr>
+    <td colSpan="5" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
+      Nenhum produto encontrado.
+    </td>
+  </tr>
+)}
           </tbody>
         </table>
       </div>
+             
+      <ProdutoModal
+        show={showModal}
+        editing={editingId !== null}
+        formData={formData}
+        onChange={alterarCampo}
+        onClose={fecharModal}
+        onSave={salvarProduto}
+      />
     </div>
   );
 }
+
