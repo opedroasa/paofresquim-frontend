@@ -53,6 +53,16 @@ function ProdutoModal({
             />
           </label>
 
+            <label className="field-full">
+            <span>Código de Barras</span>
+            <input
+              name="codigoBarras"
+              value={formData.codigoBarras}
+              onChange={onChange}
+              required
+            />
+          </label>
+
           <label>
             <span>Categoria</span>
             <select
@@ -105,12 +115,12 @@ function ProdutoModal({
 
 export default function Produtos() {
   const [produtos, setProdutos] = useState([
-    { id: 1, nome: "Pão de Queijo", categoria: "Pães", preco: "R$0,50", estoque: 200 },
-    { id: 2, nome: "Brigadeiro", categoria: "Doce", preco: "R$1,00", estoque: 20 },
-    { id: 3, nome: "Pão Francês", categoria: "Pães", preco: "R$0,25", estoque: 50 },
-    { id: 4, nome: "Mussarela", categoria: "Frios", preco: "R$30,00", estoque: 3 },
-    { id: 5, nome: "Bolo de Chocolate", categoria: "Bolo", preco: "R$4,50", estoque: 10 },
-    { id: 6, nome: "Coxinha", categoria: "Salgado", preco: "R$3,50", estoque: 25 },
+    { id: 1, nome: "Pão de Queijo", codigoBarras: "00000", categoria: "Pães", preco: "R$0,50", estoque: 200 },
+    { id: 2, nome: "Brigadeiro", codigoBarras: "11111", categoria: "Doce", preco: "R$1,00", estoque: 20 },
+    { id: 3, nome: "Pão Francês", codigoBarras: "22222", categoria: "Pães", preco: "R$0,25", estoque: 50 },
+    { id: 4, nome: "Mussarela", codigoBarras: "33333", categoria: "Frios", preco: "R$30,00", estoque: 3 },
+    { id: 5, nome: "Bolo de Chocolate", codigoBarras: "44444", categoria: "Bolo", preco: "R$4,50", estoque: 10 },
+    { id: 6, nome: "Coxinha", codigoBarras: "55555", categoria: "Salgado", preco: "R$3,50", estoque: 25 },
   ]);
 
   const [busca, setBusca] = useState("");
@@ -119,6 +129,7 @@ export default function Produtos() {
 
   const [formData, setFormData] = useState({
     nome: "",
+    codigoBarras: "",
     categoria: "",
     preco: "",
     estoque: "",
@@ -128,6 +139,7 @@ export default function Produtos() {
     setEditingId(null);
     setFormData({
       nome: "",
+      codigoBarras: "",
       categoria: "",
       preco: "",
       estoque: "",
@@ -139,6 +151,7 @@ export default function Produtos() {
     setEditingId(produto.id);
     setFormData({
       nome: produto.nome,
+      codigoBarras: produto.codigoBarras,
       categoria: produto.categoria,
       preco: produto.preco,
       estoque: produto.estoque,
@@ -179,6 +192,7 @@ export default function Produtos() {
       const novoProduto = {
         id: Date.now(),
         nome: formData.nome,
+        codigoBarras: formData.codigoBarras,
         categoria: formData.categoria,
         preco: formData.preco,
         estoque: Number(formData.estoque),
@@ -236,6 +250,7 @@ export default function Produtos() {
           <thead>
             <tr>
               <th>NOME</th>
+              <th>CÓD.BARRAS</th>
               <th>CATEGORIA</th>
               <th>PREÇO</th>
               <th>ESTOQUE</th>
@@ -247,6 +262,7 @@ export default function Produtos() {
             {produtosFiltrados.map((p) => (
               <tr key={p.id}>
                 <td>{p.nome}</td>
+                <td>{p.codigoBarras}</td>
                 <td>{p.categoria}</td>
                 <td>{p.preco}</td>
                 <td>{p.estoque}</td>
@@ -274,7 +290,7 @@ export default function Produtos() {
             ))}
               {produtosFiltrados.length === 0 && (
   <tr>
-    <td colSpan="5" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
+    <td colSpan="6" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
       Nenhum produto encontrado.
     </td>
   </tr>
