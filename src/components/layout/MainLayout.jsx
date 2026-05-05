@@ -6,6 +6,7 @@ import Cliente from "../../pages/Cliente";
 import Ponto from "../../pages/Ponto";
 import Funcionario from "../../pages/Funcionario";
 import Produto from "../../pages/Produto";
+import Relatorio from "../../pages/Relatorio";
 
 export default function MainLayout() {
   const [activePage, setActivePage] = useState("dashboard");
@@ -17,7 +18,7 @@ export default function MainLayout() {
     ponto: <Ponto />,
     produto: <Produto />,
     funcionario: <Funcionario />,
-    relatorio: <div style={{ padding: 40 }}>Página de Relatórios em construção...</div>
+    relatorio: <Relatorio />,
   };
 
   return (
