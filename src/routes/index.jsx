@@ -18,7 +18,7 @@ export default function RoutesApp() {
 
         <Route path="/produto" element={<Produto/>}/>
 
-        <Route path="/relatorio" element={<Relatorio/>}/>
+        <Route path="/relatorio" element={<Relatorio/>} />
 
         
 
