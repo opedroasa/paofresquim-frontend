@@ -210,7 +210,9 @@ export default function Produtos() {
   };
 
   const produtosFiltrados = produtos.filter((p) =>
-    p.nome.toLowerCase().includes(busca.toLowerCase())
+    p.nome.toLowerCase().includes(busca.toLowerCase()) ||
+    p.codigoBarras.toLowerCase().includes(busca.toLowerCase())
+
   );
 
   return (
@@ -237,7 +239,7 @@ export default function Produtos() {
 
       <input
         type="text"
-        placeholder="Buscar produto..."
+        placeholder="Buscar por nome ou cód. Barras..."
         className="input-busca"
         value={busca}
         onChange={(e) => setBusca(e.target.value)}
