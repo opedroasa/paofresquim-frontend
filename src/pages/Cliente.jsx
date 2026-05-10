@@ -1,39 +1,34 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import "./Cliente.css"
 import ClienteModal from "../components/cliente/ClienteModal";
 import ClienteTable from "../components/cliente/ClienteTable";
-
-const clientesIniciais = [
-  {
-    id: 1,
-    name: "Pedro",
-    phone: "(34)9999-0000",
-    email: "pedro@gmail.com",
-    cpf: "000.000.000-33"
-  },
-  {
-    id: 2,
-    name: "Lucas",
-    phone: "(34)8888-2222",
-    email: "lucas@gmail.com",
-    cpf: "000.000.000-13"
-  },
-  {
-    id: 3,
-    name: "Ana",
-    phone: "(11)2222-2222",
-    email: "ana@gmail.com",
-    cpf: "000.000.000-23"
-  }
-];
+import ConfirmModal from "../components/ConfirmModal";
+import { useEffect } from "react";
+import {
+  listarClientes,
+  criarCliente,
+  atualizarCliente,
+  deletarCliente
+} from "../services/clienteService";
 
 const formularioVazio = {
-  name: "",
-  phone: "",
+  idCliente: null,
+  nome: "",
+  telefone: "",
   email: "",
   cpf: "",
-  address: "",
-  notes: ""
+  statusCredito: "",
+
+  dataNascimento: "",
+
+  endereco: {
+    logradouro: "",
+    numero: "",
+    cidade: "",
+    uf: "",
+    pais: "Brasil"
+  }
 };
 
 function normalizarTexto(valor) {
@@ -41,18 +36,38 @@ function normalizarTexto(valor) {
 }
 
 export default function Cliente() {
-  const [clientes, setClientes] = useState(clientesIniciais);
+  const [clientes, setClientes] = useState([]);
   const [busca, setBusca] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
   const [clienteEditando, setClienteEditando] = useState(null);
   const [formData, setFormData] = useState(formularioVazio);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [clienteSelecionado, setClienteSelecionado] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+  carregarClientes();
+}, []);
+
+const carregarClientes = async () => {
+  try {
+    const data = await listarClientes();
+
+    setClientes(data);
+  } catch (error) {
+    console.error(
+      "Erro ao carregar clientes",
+      error
+    );
+  }
+};
 
   const clientesFiltrados = clientes.filter((cliente) => {
     const termoBusca = normalizarTexto(busca);
 
     if (!termoBusca) return true;
 
-    return [cliente.name, cliente.phone, cliente.cpf]
+  return [cliente.nome, cliente.telefone, cliente.cpf]
       .map((campo) => normalizarTexto(campo))
       .some((campo) => campo.includes(termoBusca));
   });
@@ -75,37 +90,108 @@ export default function Cliente() {
     setFormData(formularioVazio);
   };
 
-  const lidarComMudancaFormulario = (event) => {
-    const { name, value } = event.target;
-    setFormData((atual) => ({ ...atual, [name]: value }));
-  };
+const limparNumero = (valor) => {
+  return valor.replace(/\D/g, "");
+};
 
-  const salvarCliente = (event) => {
-    event.preventDefault();
+const lidarComMudancaFormulario = (event) => {
+  const { name, value } = event.target;
 
-    const payload = {
-      ...formData,
-      address: formData.address ?? "",
-      notes: formData.notes ?? "",
-      id: clienteEditando?.id ?? Date.now()
-    };
+  let valorTratado = value;
+
+  if (name === "cpf" || name === "telefone") {
+    valorTratado = limparNumero(value);
+  }
+
+  if (name.includes(".")) {
+    const [objeto, campo] = name.split(".");
+
+    setFormData((atual) => ({
+      ...atual,
+      [objeto]: {
+        ...atual[objeto],
+        [campo]: valorTratado
+      }
+    }));
+
+    return;
+  }
+
+  setFormData((atual) => ({
+    ...atual,
+    [name]: valorTratado
+  }));
+};
+
+const salvarCliente = async (event) => {
+  event.preventDefault();
+
+  setLoading(true);
+
+  try {
 
     if (clienteEditando) {
-      setClientes((atual) =>
-        atual.map((cliente) =>
-          cliente.id === clienteEditando.id ? payload : cliente
-        )
-      );
+      await atualizarCliente(formData);
     } else {
-      setClientes((atual) => [...atual, payload]);
+      await criarCliente(formData);
     }
 
-    fecharModal();
-  };
+    await carregarClientes();
 
-  const excluirCliente = (id) => {
-    setClientes((atual) => atual.filter((cliente) => cliente.id !== id));
-  };
+    toast.success(
+      clienteEditando
+        ? "Cliente atualizado com sucesso"
+        : "Cliente cadastrado com sucesso"
+    );
+
+    fecharModal();
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao salvar cliente",
+      error
+    );
+
+    toast.error(
+      error.response?.data ||
+      "Erro ao salvar cliente"
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
+
+
+const abrirModalExcluir = (cliente) => {
+  setClienteSelecionado(cliente);
+  setShowDeleteModal(true);
+};
+
+const confirmarExclusao = async () => {
+  try {
+    await deletarCliente(
+      clienteSelecionado.idCliente
+    );
+
+    await carregarClientes();
+
+    setShowDeleteModal(false);
+    setClienteSelecionado(null);
+              toast.success("Cliente excluído com sucesso");
+
+
+  } catch (error) {
+    console.error(
+      "Erro ao excluir cliente",
+      error
+    );
+    toast.error("Erro ao excluir cliente");
+  }
+};
 
   return (
     <main className="content-panel">
@@ -145,7 +231,7 @@ export default function Cliente() {
       <ClienteTable
         clientes={clientesFiltrados}
         onEdit={abrirModalEdicao}
-        onDelete={excluirCliente}
+        onDelete={abrirModalExcluir}
       />
 
       <ClienteModal
@@ -155,6 +241,20 @@ export default function Cliente() {
         onChange={lidarComMudancaFormulario}
         formData={formData}
         editing={clienteEditando}
+        loading={loading}
+      />
+      
+      <ConfirmModal
+        show={showDeleteModal}
+        title="Excluir cliente"
+        message={`Deseja realmente excluir ${
+          clienteSelecionado?.nome || "este cliente"
+        }?`}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setClienteSelecionado(null);
+        }}
+        onConfirm={confirmarExclusao}
       />
     </main>
   );

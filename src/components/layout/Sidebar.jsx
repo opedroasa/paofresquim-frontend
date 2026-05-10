@@ -9,7 +9,9 @@ const menuItems = [
   { key: "cliente", label: "Clientes", icon: UsersIcon },
   { key: "funcionario", label: "Funcionário", icon: BadgeIcon },
   { key: "ponto", label: "Registro de Ponto", icon: BadgeIcon },
-  { key: "relatorio", label: "Relatório", icon: ChartIcon }
+  { key: "relatorio", label: "Relatório", icon: ChartIcon },
+  { key: "camera", label: "Câmeras", icon: CameraIcon },
+  { key: "chatbot", label: "Chatbot", icon: ChatbotIcon }
 ];
 
 function IconWrapper({ children }) {
@@ -96,6 +98,27 @@ function LogoutIcon() {
         <path d="m16 7 5 5-5 5" />
       </svg>
     </span>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <IconWrapper>
+      <path d="M4 7h3l2-2h6l2 2h3v12H4V7Z" />
+      <circle cx="12" cy="13" r="4" />
+    </IconWrapper>
+  );
+}
+
+function ChatbotIcon() {
+  return (
+    <IconWrapper>
+      <rect x="4" y="5" width="16" height="12" rx="3" />
+      <circle cx="9" cy="11" r="1" />
+      <circle cx="15" cy="11" r="1" />
+      <path d="M9 15h6" />
+      <path d="M12 5V3" />
+    </IconWrapper>
   );
 }
 

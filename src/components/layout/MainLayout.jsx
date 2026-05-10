@@ -7,9 +7,12 @@ import Ponto from "../../pages/Ponto";
 import Funcionario from "../../pages/Funcionario";
 import Produto from "../../pages/Produto";
 import Relatorio from "../../pages/Relatorio";
+import Camera from "../../pages/Camera";
+import Chatbot from "../../pages/Chatbot";
 
 export default function MainLayout() {
   const [activePage, setActivePage] = useState("dashboard");
+  console.log("PAGINA ATIVA:", activePage);
 
   const pages = {
     dashboard: <Dashboard />,
@@ -19,6 +22,8 @@ export default function MainLayout() {
     produto: <Produto />,
     funcionario: <Funcionario />,
     relatorio: <Relatorio />,
+    camera: <Camera />,
+    chatbot: <Chatbot />
   };
 
   return (

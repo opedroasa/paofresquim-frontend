@@ -18,7 +18,28 @@ function TrashIcon() {
   );
 }
 
-// ATENÇÃO: Mudei aqui de 'customers' para 'clientes'
+function mascaraTelefone(valor) {
+  if (!valor) return "";
+
+  return valor
+    .replace(/\D/g, "")
+    .replace(/^(\d{2})(\d)/g, "($1) $2")
+    .replace(/(\d{5})(\d)/, "$1-$2")
+    .slice(0, 15);
+}
+
+function mascaraCPF(valor) {
+  if (!valor) return "";
+
+  return valor
+    .replace(/\D/g, "")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d)/, "$1.$2")
+    .replace(/(\d{3})(\d{1,2})$/, "$1-$2")
+    .slice(0, 14);
+}
+
+
 export default function ClienteTable({ clientes, onEdit, onDelete }) {
   return (
     <section>
@@ -30,6 +51,7 @@ export default function ClienteTable({ clientes, onEdit, onDelete }) {
               <th>TELEFONE</th>
               <th>E-MAIL</th>
               <th>CPF</th>
+              <th>STATUS</th>
               <th aria-label="Ações" />
             </tr>
           </thead>
@@ -37,16 +59,27 @@ export default function ClienteTable({ clientes, onEdit, onDelete }) {
           <tbody>
             {clientes.length > 0 ? (
               clientes.map((cliente) => (
-                <tr key={cliente.id}>
-                  <td>{cliente.name}</td>
-                  <td>{cliente.phone}</td>
+                <tr key={cliente.idCliente}>
+                  <td>{cliente.nome}</td>
+                  <td>{mascaraTelefone(cliente.telefone)}</td>
                   <td>{cliente.email}</td>
-                  <td>{cliente.cpf}</td>
+                  <td>{mascaraCPF(cliente.cpf)}</td>
+                  <td>
+                  <span
+                    className={`status-badge ${
+                      cliente.statusCredito === "ATIVO"
+                        ? "ativo"
+                        : "inativo"
+                    }`}
+                  >
+                    {cliente.statusCredito || "INATIVO"}
+                  </span>
+                </td>
                   <td className="actions-cell">
                     <button
                       type="button"
                       className="icon-button"
-                      aria-label={`Editar ${cliente.name}`}
+                      aria-label={`Editar ${cliente.nome}`}
                       onClick={() => onEdit(cliente)}
                     >
                       <PencilIcon />
@@ -55,8 +88,8 @@ export default function ClienteTable({ clientes, onEdit, onDelete }) {
                     <button
                       type="button"
                       className="icon-button"
-                      aria-label={`Excluir ${cliente.name}`}
-                      onClick={() => onDelete(cliente.id)}
+                      aria-label={`Excluir ${cliente.nome}`}
+                      onClick={() => onDelete(cliente)}
                     >
                       <TrashIcon />
                     </button>
@@ -65,7 +98,7 @@ export default function ClienteTable({ clientes, onEdit, onDelete }) {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
+                <td colSpan="6" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
                   Nenhum cliente encontrado.
                 </td>
               </tr>

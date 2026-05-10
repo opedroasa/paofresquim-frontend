@@ -5,6 +5,8 @@ import MainLayout from "../components/layout/MainLayout";
 import Ponto from "../pages/Ponto";
 import Produto from "../pages/Produto";
 import Relatorio from "../pages/Relatorio";
+import Camera from "../pages/Camera";
+import Chatbot from "../pages/Chatbot";
 
 
 export default function RoutesApp() {
@@ -19,6 +21,10 @@ export default function RoutesApp() {
         <Route path="/produto" element={<Produto/>}/>
 
         <Route path="/relatorio" element={<Relatorio/>} />
+
+        <Route path="/camera" element={<Camera/>} />
+
+        <Route path="/chatbot" element={<Chatbot/>} />
 
         
 

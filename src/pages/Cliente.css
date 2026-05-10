@@ -252,3 +252,39 @@
 .save-client-button:hover {
   background: #642b0b;
 }
+
+.cliente-form select {
+  width: 100%;
+  border: 0;
+  border-radius: 5px;
+  background: #fff6e7;
+  outline: none;
+  color: #1f1408;
+  padding: 8px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.status-badge.ativo {
+  background: #028d3cd0;
+  color: #000000;
+}
+
+.status-badge.inativo {
+  background: #d50000bf;
+  color: #000000;
+}
+
+.save-client-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

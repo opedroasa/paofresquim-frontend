@@ -35,11 +35,11 @@ export default function Login() {
 
         <h2>LOGIN</h2>
 
-        <button className="google-btn">
+        {/*<button className="google-btn">
           Continue com Google (Em breve)
         </button>
 
-        <div className="divider">ou</div>
+        <div className="divider">ou</div>*/}
 
         <form onSubmit={handleLogin} className="login-form">
           <input
@@ -63,7 +63,6 @@ export default function Login() {
 
         <div className="login-footer">
           <a href="#">Esqueceu a senha</a>
-          <a href="#">Criar conta</a>
         </div>
 
       </div>
