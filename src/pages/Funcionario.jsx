@@ -3,37 +3,34 @@ import "./Funcionario.css";
 import FuncionarioModal from "../components/funcionario/FuncionarioModal";
 import FuncionarioTable from "../components/funcionario/FuncionarioTable";
 
-const funcionariosIniciais = [
-  {
-    id: 1,
-    nome: "Pedro",
-    cargo: "Gerente",
-    telefone: "(34)9999-0000",
-    salario: 7500.00,
-    status: "Ativo",
-    email: "pedro@padaria.com",
-    dataAdmissao: "2020-01-15"
-  },
-  {
-    id: 2,
-    nome: "Lucas",
-    cargo: "Padeiro",
-    telefone: "(34)8888-2222",
-    salario: 2000.00,
-    status: "Ativo",
-    email: "lucas@padaria.com",
-    dataAdmissao: "2023-05-10"
-  }
-];
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+
+import ConfirmModal from "../components/ConfirmModal";
+
+import {
+  listarFuncionarios,
+  criarFuncionario,
+  atualizarFuncionario,
+  deletarFuncionario
+} from "../services/funcionarioService";
 
 const formularioVazio = {
   nome: "",
-  cargo: "",
   telefone: "",
-  salario: "",
-  email: "",
+  cpf: "",
+  dataNascimento: "",
+  telefoneEmergencia: "",
+  senha: "",
   dataAdmissao: "",
-  status: "Ativo"
+
+  endereco: {
+    logradouro: "",
+    numero: "",
+    cidade: "",
+    uf: "",
+    pais: "Brasil"
+  }
 };
 
 function normalizarTexto(valor) {
@@ -41,17 +38,30 @@ function normalizarTexto(valor) {
 }
 
 export default function Funcionario() {
-  const [funcionarios, setFuncionarios] = useState(funcionariosIniciais);
+  const [funcionarios, setFuncionarios] = useState([]);
   const [busca, setBusca] = useState("");
   const [modalAberto, setModalAberto] = useState(false);
   const [funcionarioEditando, setFuncionarioEditando] = useState(null);
   const [formData, setFormData] = useState(formularioVazio);
 
+  const [loading, setLoading] = useState(false);
+
+const [showDeleteModal, setShowDeleteModal] =
+  useState(false);
+
+const [funcionarioSelecionado,
+  setFuncionarioSelecionado] =
+  useState(null);
+
   const funcionariosFiltrados = funcionarios.filter((func) => {
     const termoBusca = normalizarTexto(busca);
     if (!termoBusca) return true;
 
-    return [func.nome, func.telefone, func.cargo]
+    return [
+  func.nome,
+  func.telefone,
+  func.cpf
+]
       .map(normalizarTexto)
       .some((campo) => campo.includes(termoBusca));
   });
@@ -62,11 +72,22 @@ export default function Funcionario() {
     setModalAberto(true);
   };
 
-  const abrirModalEdicao = (funcionario) => {
-    setFuncionarioEditando(funcionario);
-    setFormData({ ...formularioVazio, ...funcionario });
-    setModalAberto(true);
-  };
+const abrirModalEdicao = (funcionario) => {
+
+  setFuncionarioEditando(funcionario);
+
+  setFormData({
+    ...formularioVazio,
+    ...funcionario,
+
+    endereco: {
+      ...formularioVazio.endereco,
+      ...funcionario.endereco
+    }
+  });
+
+  setModalAberto(true);
+};
 
   const fecharModal = () => {
     setModalAberto(false);
@@ -74,33 +95,151 @@ export default function Funcionario() {
     setFormData(formularioVazio);
   };
 
-  const lidarComMudanca = (event) => {
-    const { name, value } = event.target;
-    setFormData((atual) => ({ ...atual, [name]: value }));
-  };
+const limparNumero = (valor) => {
+  return valor.replace(/\D/g, "");
+};
 
-  const salvarFuncionario = (event) => {
-    event.preventDefault();
+const lidarComMudanca = (event) => {
+  const { name, value } = event.target;
 
-    const payload = {
-      ...formData,
-      salario: Number(formData.salario), // Garante que o salário seja número
-      id: funcionarioEditando?.id ?? Date.now()
-    };
+  let valorTratado = value;
+
+  if (
+    name === "cpf" ||
+    name === "telefone" ||
+    name === "telefoneEmergencia"
+  ) {
+    valorTratado = limparNumero(value);
+  }
+
+  if (name.includes(".")) {
+
+    const [objeto, campo] = name.split(".");
+
+    setFormData((atual) => ({
+      ...atual,
+      [objeto]: {
+        ...atual[objeto],
+        [campo]: valorTratado
+      }
+    }));
+
+    return;
+  }
+
+  setFormData((atual) => ({
+    ...atual,
+    [name]: valorTratado
+  }));
+};
+
+const salvarFuncionario = async (event) => {
+
+  event.preventDefault();
+
+  setLoading(true);
+
+  try {
 
     if (funcionarioEditando) {
-      setFuncionarios((atual) =>
-        atual.map((func) => (func.id === funcionarioEditando.id ? payload : func))
-      );
-    } else {
-      setFuncionarios((atual) => [...atual, payload]);
-    }
-    fecharModal();
-  };
 
-  const excluirFuncionario = (id) => {
-    setFuncionarios((atual) => atual.filter((func) => func.id !== id));
-  };
+      await atualizarFuncionario(formData);
+
+    } else {
+
+      await criarFuncionario(formData);
+    }
+
+    await carregarFuncionarios();
+
+    toast.success(
+      funcionarioEditando
+        ? "Funcionário atualizado com sucesso"
+        : "Funcionário cadastrado com sucesso"
+    );
+
+    fecharModal();
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao salvar funcionário",
+      error
+    );
+
+    toast.error(
+      error.response?.data ||
+      "Erro ao salvar funcionário"
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
+
+const confirmarExclusao = async () => {
+
+  try {
+
+    await deletarFuncionario(
+      funcionarioSelecionado.idFuncionario
+    );
+
+    await carregarFuncionarios();
+
+    setShowDeleteModal(false);
+
+    setFuncionarioSelecionado(null);
+
+    toast.success(
+      "Funcionário excluído com sucesso"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao excluir funcionário",
+      error
+    );
+
+    toast.error(
+      error.response?.data ||
+      "Erro ao excluir funcionário"
+    );
+  }
+};
+
+  useEffect(() => {
+  carregarFuncionarios();
+}, []);
+
+const carregarFuncionarios = async () => {
+
+  try {
+
+    const data =
+      await listarFuncionarios();
+
+    setFuncionarios(data);
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao carregar funcionários",
+      error
+    );
+
+    toast.error(
+      "Erro ao carregar funcionários"
+    );
+  }
+};
+
+const abrirModalExclusao = (funcionario) => {
+  setFuncionarioSelecionado(funcionario);
+  setShowDeleteModal(true);
+};
 
   return (
     <main className="content-panel">
@@ -134,7 +273,7 @@ export default function Funcionario() {
       <FuncionarioTable
         funcionarios={funcionariosFiltrados}
         onEdit={abrirModalEdicao}
-        onDelete={excluirFuncionario}
+        onDelete={abrirModalExclusao}
       />
 
       <FuncionarioModal
@@ -144,7 +283,19 @@ export default function Funcionario() {
         onChange={lidarComMudanca}
         formData={formData}
         editing={funcionarioEditando}
+        loading={loading}
       />
+
+      <ConfirmModal
+  show={showDeleteModal}
+  title="Excluir funcionário"
+  message={`Deseja realmente excluir ${funcionarioSelecionado?.nome}?`}
+  onConfirm={confirmarExclusao}
+  onClose={() => {
+    setShowDeleteModal(false);
+    setFuncionarioSelecionado(null);
+  }}
+/>
     </main>
   );
 }

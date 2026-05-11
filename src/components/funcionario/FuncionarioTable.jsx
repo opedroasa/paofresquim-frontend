@@ -18,67 +18,68 @@ function TrashIcon() {
   );
 }
 
-function formatarMoeda(valor) {
-  return Number(valor).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL"
-  });
-}
-
 export default function FuncionarioTable({ funcionarios, onEdit, onDelete }) {
   return (
     <section>
       <div className="funcionario-table-wrap">
         <table className="funcionario-table">
-          <thead>
-            <tr>
-              <th>NOME</th>
-              <th>CARGO</th>
-              <th>TELEFONE</th>
-              <th>SALÁRIO</th>
-              <th>STATUS</th>
-              <th aria-label="Ações" />
-            </tr>
-          </thead>
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>TELEFONE</th>
+            <th>CPF</th>
+            <th>ADMISSÃO</th>
+            <th aria-label="Ações" />
+          </tr>
+        </thead>
 
-          <tbody>
-            {funcionarios.length > 0 ? (
-              funcionarios.map((funcionario) => (
-                <tr key={funcionario.id}>
-                  <td>{funcionario.nome}</td>
-                  <td>{funcionario.cargo}</td>
-                  <td>{funcionario.telefone}</td>
-                  <td>{formatarMoeda(funcionario.salario)}</td>
-                  <td>{funcionario.status}</td>
-                  <td className="actions-cell">
-                    <button
-                      type="button"
-                      className="icon-button"
-                      aria-label={`Editar ${funcionario.nome}`}
-                      onClick={() => onEdit(funcionario)}
-                    >
-                      <PencilIcon />
-                    </button>
+        <tbody>
+          {funcionarios.length > 0 ? (
+            funcionarios.map((funcionario) => (
+              <tr key={funcionario.idFuncionario}>
+                <td>{funcionario.nome}</td>
+                <td>{funcionario.telefone}</td>
+                <td>{funcionario.cpf}</td>
+                <td>{funcionario.dataAdmissao}</td>
 
-                    <button
-                      type="button"
-                      className="icon-button"
-                      aria-label={`Excluir ${funcionario.nome}`}
-                      onClick={() => onDelete(funcionario.id)}
-                    >
-                      <TrashIcon />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="empty-state" style={{ textAlign: "center", padding: "30px" }}>
-                  Nenhum funcionário encontrado.
+                <td className="actions-cell">
+
+                  <button
+                    type="button"
+                    className="icon-button"
+                    onClick={() => onEdit(funcionario)}
+                  >
+                    <PencilIcon />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="icon-button"
+                    onClick={() =>
+                      onDelete(funcionario)
+                    }
+                  >
+                    <TrashIcon />
+                  </button>
+
                 </td>
               </tr>
-            )}
-          </tbody>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan="5"
+                className="empty-state"
+                style={{
+                  textAlign: "center",
+                  padding: "30px"
+                }}
+              >
+                Nenhum funcionário encontrado.
+              </td>
+            </tr>
+          )}
+        </tbody>
         </table>
       </div>
     </section>
