@@ -1,50 +1,81 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ClienteForm from "./ClienteForm";
+import api from "../../services/api";
 
 export default function ClienteList() {
-  const [customers, setCustomers] = useState([
-    { id: 1, name: "João", email: "joao@email.com", phone: "9999-9999" },
-    { id: 2, name: "Maria", email: "maria@email.com", phone: "8888-8888" }
-  ]);
-
+  const [customers, setCustomers] = useState([]);
   const [editing, setEditing] = useState(null);
 
-  const handleSave = (data) => {
-    if (editing) {
-      setCustomers(prev =>
-        prev.map(c => c.id === editing.id ? { ...data, id: editing.id } : c)
-      );
-      setEditing(null);
-    } else {
-      setCustomers(prev => [
-        ...prev,
-        { ...data, id: Date.now() }
-      ]);
+  const carregarClientes = async () => {
+    try {
+      const response = await api.get("/clientes");
+      setCustomers(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar clientes", error);
     }
   };
 
-  const handleDelete = (id) => {
-    setCustomers(prev => prev.filter(c => c.id !== id));
+  useEffect(() => {
+    carregarClientes();
+  }, []);
+
+  const handleSave = async (data) => {
+    try {
+      if (editing) {
+        await api.put("/clientes", {
+          ...data,
+          idCliente: editing.idCliente
+        });
+      } else {
+        await api.post("/clientes", data);
+      }
+
+      setEditing(null);
+      await carregarClientes();
+    } catch (error) {
+      console.error("Erro ao salvar cliente", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/clientes/${id}`);
+      await carregarClientes();
+    } catch (error) {
+      console.error("Erro ao excluir cliente", error);
+    }
   };
 
   return (
     <div style={{ padding: 20 }}>
       <h1>Clientes</h1>
 
-      <CustomerForm
+      <ClienteForm
         onSave={handleSave}
         editing={editing}
         onCancel={() => setEditing(null)}
       />
 
       {customers.map((c) => (
-        <div key={c.id} style={{ borderBottom: "1px solid #ccc", padding: 10 }}>
-          <strong>{c.name}</strong>
+        <div
+          key={c.idCliente}
+          style={{ borderBottom: "1px solid #ccc", padding: 10 }}
+        >
+          <strong>{c.nome}</strong>
           <p>{c.email}</p>
-          <p>{c.phone}</p>
+          <p>{c.telefone}</p>
+          <p>{c.cpf}</p>
+          <p>{c.dataNascimento}</p>
+
+          {c.endereco && (
+            <p>
+              {c.endereco.logradouro}, {c.endereco.numero} -{" "}
+              {c.endereco.cidade}/{c.endereco.uf}
+            </p>
+          )}
 
           <button onClick={() => setEditing(c)}>Editar</button>
-          <button onClick={() => handleDelete(c.id)}>Excluir</button>
+          <button onClick={() => handleDelete(c.idCliente)}>Excluir</button>
         </div>
       ))}
     </div>
