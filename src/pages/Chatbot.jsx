@@ -2,13 +2,19 @@ import "./Chatbot.css";
 
 export default function Chatbot() {
   return (
-    <main className="chatbot-construction">
-      <div className="construction-card">
-        <div className="construction-icon">🚧</div>
+    <main className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>📊 Dashboard da Alice</h1>
+        <p>Métricas e Inteligência de Negócios da Padaria PãoFresquim</p>
+      </div>
 
-        <h1>Chatbot em Construção</h1>
-
-        <span>Em breve disponível 🤖</span>
+      <div className="iframe-wrapper">
+        <iframe
+          title="Dashboard PãoFresquim"
+          src="https://app.powerbi.com/reportEmbed?reportId=153aa935-c47d-4e49-88fa-3bbbe9ecd7fd&autoAuth=true"
+          frameBorder="0"
+          allowFullScreen={true}
+        ></iframe>
       </div>
     </main>
   );
