@@ -4,8 +4,8 @@ export default function Chatbot() {
   return (
     <main className="dashboard-container">
       <div className="dashboard-header">
-        <h1>📊 Dashboard da Alice</h1>
-        <p>Métricas e Inteligência de Negócios da Padaria PãoFresquim</p>
+        <h1>📊 Dashboard da AliceBOT</h1>
+        <p>Métricas BI - Padaria PãoFresquim</p>
       </div>
 
       <div className="iframe-wrapper">
