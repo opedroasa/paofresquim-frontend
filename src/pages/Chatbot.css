@@ -27,24 +27,24 @@
 /* Essa é a "caixa" que segura o Power BI */
 .iframe-wrapper {
   width: 100%;
-  max-width: 1200px; /* Largura excelente para painéis */
-  height: 75vh; /* Ocupa 75% da altura da tela */
-  min-height: 600px; /* Mas nunca fica menor que 600px */
+  max-width: 1200px; 
+  height: 75vh; 
+  min-height: 600px; 
   background-color: #fff;
-  border: 2px solid #D96941; /* Borda laranja da padaria */
+  border: 2px solid #D96941; 
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  overflow: hidden; /* Garante que os cantos arredondados funcionem */
+  overflow: hidden; 
 }
 
-/* O iframe preenche toda a caixa */
+
 .iframe-wrapper iframe {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-/* Adaptação para celular/telas menores */
+
 @media (max-width: 700px) {
   .dashboard-container {
     padding: 20px 10px;
