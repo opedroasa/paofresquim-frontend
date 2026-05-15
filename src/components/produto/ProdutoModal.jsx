@@ -6,6 +6,34 @@ export default function ProdutoModal({
   onClose,
   onSave,
 }) {
+
+  function mascaraMoeda(valor) {
+
+  if (
+    valor === null ||
+    valor === undefined
+  ) {
+    return "";
+  }
+
+  valor = valor.toString();
+
+  valor = valor.replace(/\D/g, "");
+
+  valor = (
+    Number(valor) / 100
+  ).toFixed(2);
+
+  valor = valor.replace(".", ",");
+
+  valor = valor.replace(
+    /(\d)(?=(\d{3})+(?!\d))/g,
+    "$1."
+  );
+
+  return valor;
+}
+
   if (!show) return null;
 
   return (
@@ -62,62 +90,96 @@ export default function ProdutoModal({
           </label>
 
           <label>
-            <span>Categoria</span>
-
-            <select
-              name="categoria"
-              value={formData.categoria}
-              onChange={onChange}
-              required
-            >
-              <option value="">
-                Selecione...
-              </option>
-
-              <option value="Pães">
-                Pães
-              </option>
-
-              <option value="Doce">
-                Doce
-              </option>
-
-              <option value="Frios">
-                Frios
-              </option>
-
-              <option value="Bolo">
-                Bolo
-              </option>
-
-              <option value="Salgado">
-                Salgado
-              </option>
-            </select>
-          </label>
-
-          <label>
             <span>Preço</span>
 
-            <input
-              name="preco"
-              value={formData.preco}
-              onChange={onChange}
-              required
-            />
+<input
+  name="preco"
+  value={mascaraMoeda(
+    formData.preco
+  )}
+  onChange={onChange}
+  required
+/>
           </label>
 
-          <label className="field-full">
-            <span>Estoque</span>
+<label>
+  <span>Unidade</span>
 
-            <input
-              type="number"
-              name="estoque"
-              value={formData.estoque}
-              onChange={onChange}
-              required
-            />
-          </label>
+  <select
+    name="unidadeMedida"
+    value={formData.unidadeMedida}
+    onChange={onChange}
+    required
+  >
+    <option value="">
+      Selecione...
+    </option>
+
+    <option value="UN">
+      Unidade
+    </option>
+
+    <option value="KG">
+      KG
+    </option>
+
+    <option value="G">
+      Grama
+    </option>
+
+    <option value="L">
+      Litro
+    </option>
+
+    <option value="ML">
+      ML
+    </option>
+  </select>
+</label>
+
+<label>
+  <span>Quantidade Atual</span>
+
+  <input
+    type="number"
+    step="0.001"
+    name="quantidadeAtual"
+    value={formData.quantidadeAtual}
+    onChange={onChange}
+    required
+  />
+</label>
+
+<label>
+  <span>Estoque Mínimo</span>
+
+  <input
+    type="number"
+    step="0.001"
+    name="estoqueMinimo"
+    value={formData.estoqueMinimo}
+    onChange={onChange}
+    required
+  />
+</label>
+
+<label className="field-full">
+  <span>Favorito</span>
+
+<select
+  name="favorito"
+  value={String(formData.favorito)}
+  onChange={onChange}
+>
+<option value="false">
+  Não
+</option>
+
+<option value="true">
+  Sim
+</option>
+  </select>
+</label>
 
           <div className="modal-actions">
             <button

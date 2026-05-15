@@ -5,7 +5,9 @@ export default function ConfirmModal({
   title = "Confirmar exclusão",
   message = "Deseja realmente excluir este item?",
   onConfirm,
-  onClose
+  onClose,
+  confirmText = "Excluir",
+  cancelText = "Cancelar"
 }) {
   if (!show) return null;
 
@@ -38,21 +40,21 @@ export default function ConfirmModal({
         </div>
 
         <div className="confirm-actions">
-          <button
-            type="button"
-            className="cancel-button"
-            onClick={onClose}
-          >
-            Cancelar
-          </button>
+<button
+  type="button"
+  className="cancel-button"
+  onClick={onClose}
+>
+  {cancelText}
+</button>
 
-          <button
-            type="button"
-            className="confirm-button"
-            onClick={onConfirm}
-          >
-            Excluir
-          </button>
+<button
+  type="button"
+  className="confirm-button"
+  onClick={onConfirm}
+>
+  {confirmText}
+</button>
         </div>
       </div>
     </div>

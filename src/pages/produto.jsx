@@ -5,36 +5,37 @@ import ProdutoModal from "../components/produto/ProdutoModal";
 import ProdutoTable from "../components/produto/ProdutoTable";
 import ConfirmModal from "../components/ConfirmModal";
 
-const produtosIniciais = [
-  {
-    id: 1,
-    nome: "Pão de Queijo",
-    codigoBarras: "00000",
-    categoria: "Pães",
-    preco: "R$0,50",
-    estoque: 200,
-  },
-  {
-    id: 2,
-    nome: "Brigadeiro",
-    codigoBarras: "11111",
-    categoria: "Doce",
-    preco: "R$1,00",
-    estoque: 20,
-  },
-];
+import { useEffect } from "react";
+
+import toast from "react-hot-toast";
+
+import {
+  listarProdutos,
+  criarProduto,
+  atualizarProduto,
+  deletarProduto
+} from "../services/produtoService";
+
+import {
+  criarEstoque,
+  atualizarEstoque,
+  buscarEstoqueProduto
+} from "../services/estoqueService";
 
 const formularioVazio = {
   nome: "",
-  codigoBarras: "",
-  categoria: "",
   preco: "",
-  estoque: "",
+  unidadeMedida: "",
+  codigoBarras: "",
+  favorito: false,
+
+  quantidadeAtual: "",
+  estoqueMinimo: ""
 };
 
 export default function Produto() {
   const [produtos, setProdutos] =
-    useState(produtosIniciais);
+    useState([])
 
   const [busca, setBusca] = useState("");
 
@@ -53,6 +54,13 @@ export default function Produto() {
   const [formData, setFormData] =
     useState(formularioVazio);
 
+    const [loading, setLoading] =
+  useState(false);
+
+  useEffect(() => {
+  carregarProdutos();
+}, []);
+
   const produtosFiltrados = produtos.filter(
     (produto) =>
       produto.nome
@@ -62,6 +70,70 @@ export default function Produto() {
         .toLowerCase()
         .includes(busca.toLowerCase())
   );
+
+const carregarProdutos = async () => {
+
+  try {
+
+    const produtosData =
+      await listarProdutos();
+
+    const produtosComEstoque =
+      await Promise.all(
+
+        produtosData.map(
+          async (produto) => {
+
+            try {
+
+              const estoque =
+                await buscarEstoqueProduto(
+                  produto.id
+                );
+
+              return {
+                ...produto,
+
+                quantidadeAtual:
+                  estoque.quantidadeAtual,
+
+                estoqueMinimo:
+                  estoque.estoqueMinimo
+              };
+
+            } catch {
+
+              return {
+                ...produto,
+                quantidadeAtual: 0,
+                estoqueMinimo: 0
+              };
+            }
+          }
+        )
+      );
+
+    setProdutos(
+      produtosComEstoque.sort(
+        (a, b) =>
+          a.nome.localeCompare(
+            b.nome
+          )
+      )
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao carregar produtos",
+      error
+    );
+
+    toast.error(
+      "Erro ao carregar produtos"
+    );
+  }
+};
 
   const abrirNovoProduto = () => {
     setProdutoEditando(null);
@@ -86,61 +158,165 @@ export default function Produto() {
     setFormData(formularioVazio);
   };
 
-  const alterarCampo = (event) => {
-    const { name, value } = event.target;
+const alterarCampo = (event) => {
 
-    setFormData((atual) => ({
-      ...atual,
-      [name]: value,
-    }));
-  };
+  const { name, value } =
+    event.target;
 
-  const salvarProduto = (event) => {
-    event.preventDefault();
+  let valorTratado = value;
 
-    const payload = {
-      ...formData,
-      estoque: Number(formData.estoque),
-      id:
-        produtoEditando?.id ??
-        Date.now(),
+  if (name === "preco") {
+
+    valorTratado = value
+      .replace(/\D/g, "");
+  }
+
+  if (name === "favorito") {
+
+    valorTratado =
+      value === "true";
+  }
+
+  setFormData((atual) => ({
+    ...atual,
+    [name]: valorTratado,
+  }));
+};
+
+const salvarProduto = async (event) => {
+
+  event.preventDefault();
+
+  setLoading(true);
+
+  try {
+
+    const produtoPayload = {
+      nome: formData.nome,
+preco:
+  Number(formData.preco) / 100,
+      unidadeMedida:
+        formData.unidadeMedida,
+      codigoBarras:
+        formData.codigoBarras,
+      favorito: formData.favorito
     };
 
     if (produtoEditando) {
-      setProdutos((atual) =>
-        atual.map((produto) =>
-          produto.id === produtoEditando.id
-            ? payload
-            : produto
-        )
+
+      await atualizarProduto(
+        produtoEditando.id,
+        produtoPayload
       );
+
+      const estoqueAtual =
+        await buscarEstoqueProduto(
+          produtoEditando.id
+        );
+
+      await atualizarEstoque(
+        estoqueAtual.id,
+        {
+          quantidadeAtual:
+            Number(
+              formData.quantidadeAtual
+            ),
+
+          estoqueMinimo:
+            Number(
+              formData.estoqueMinimo
+            )
+        }
+      );
+
+      toast.success(
+        "Produto atualizado com sucesso"
+      );
+
     } else {
-      setProdutos((atual) => [
-        ...atual,
-        payload,
-      ]);
+
+      const novoProduto =
+        await criarProduto(
+          produtoPayload
+        );
+
+      await criarEstoque({
+        idProduto: novoProduto.id,
+
+        quantidadeAtual:
+          Number(
+            formData.quantidadeAtual
+          ),
+
+        estoqueMinimo:
+          Number(
+            formData.estoqueMinimo
+          )
+      });
+
+      toast.success(
+        "Produto cadastrado com sucesso"
+      );
     }
 
+    await carregarProdutos();
+
     fecharModal();
-  };
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao salvar produto",
+      error
+    );
+
+    toast.error(
+      error.response?.data ||
+      "Erro ao salvar produto"
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
 
   const abrirModalExcluir = (produto) => {
     setProdutoSelecionado(produto);
     setShowDeleteModal(true);
   };
 
-  const confirmarExclusao = () => {
-    setProdutos((atual) =>
-      atual.filter(
-        (produto) =>
-          produto.id !==
-          produtoSelecionado.id
-      )
+const confirmarExclusao = async () => {
+
+  try {
+
+    await deletarProduto(
+      produtoSelecionado.id
+    );
+
+    await carregarProdutos();
+
+    toast.success(
+      "Produto excluído com sucesso"
     );
 
     setShowDeleteModal(false);
+
     setProdutoSelecionado(null);
-  };
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao excluir produto",
+      error
+    );
+
+    toast.error(
+      error.response?.data ||
+      "Erro ao excluir produto"
+    );
+  }
+};
 
   return (
     <main className="content-panel">

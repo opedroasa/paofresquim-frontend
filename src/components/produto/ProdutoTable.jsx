@@ -27,16 +27,16 @@ export default function ProdutoTable({
     <section>
       <div className="cliente-table-wrap">
         <table className="cliente-table">
-          <thead>
-            <tr>
-              <th>NOME</th>
-              <th>CÓD.BARRAS</th>
-              <th>CATEGORIA</th>
-              <th>PREÇO</th>
-              <th>ESTOQUE</th>
-              <th aria-label="Ações" />
-            </tr>
-          </thead>
+<thead>
+  <tr>
+    <th>NOME</th>
+    <th>CÓD.BARRAS</th>
+    <th>UNIDADE</th>
+    <th>PREÇO</th>
+    <th>FAVORITO</th>
+    <th aria-label="Ações" />
+  </tr>
+</thead>
 
           <tbody>
             {produtos.length > 0 ? (
@@ -44,9 +44,21 @@ export default function ProdutoTable({
                 <tr key={produto.id}>
                   <td>{produto.nome}</td>
                   <td>{produto.codigoBarras}</td>
-                  <td>{produto.categoria}</td>
-                  <td>{produto.preco}</td>
-                  <td>{produto.estoque}</td>
+<td>{produto.unidadeMedida}</td>
+
+<td>
+  {Number(produto.preco).toLocaleString(
+    "pt-BR",
+    {
+      style: "currency",
+      currency: "BRL"
+    }
+  )}
+</td>
+
+<td>
+  {produto.favorito ? "Sim" : "Não"}
+</td>
 
                   <td className="actions-cell">
                     <button

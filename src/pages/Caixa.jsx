@@ -1,16 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import "./Caixa.css";
+import { listarProdutos } from "../services/produtoService";
 
-const categories = ["Todos", "Paes", "Bolos", "Doces", "Salgados", "Bebidas", "Frios"];
+import ClientePDVModal
+from "../components/caixa/ClientePDVModal";
+import {
+  listarClientes
+} from "../services/clienteService";
 
-const products = [
-  { id: 1, barcode: "78910", name: "Pão de Queijo", category: "Paes", price: 0.5, favorite: true },
-  { id: 2, barcode: "78911", name: "Pão Francês", category: "Paes", price: 0.25, favorite: true },
-  { id: 3, barcode: "78912", name: "Bolo de Chocolate", category: "Bolos", price: 4.5, favorite: false },
-  { id: 4, barcode: "78913", name: "Brigadeiro", category: "Doces", price: 1, favorite: true },
-  { id: 5, barcode: "78914", name: "Coxinha", category: "Salgados", price: 3.5, favorite: true },
-  { id: 6, barcode: "78915", name: "Mussarela", category: "Frios", price: 30, favorite: false }
-];
+import ProductGrid
+from "../components/caixa/ProductGrid";
+
+import CartPanel
+from "../components/caixa/CartPanel";
+
+import ConfirmSaleModal
+from "../components/caixa/ConfirmSaleModal";
+
+import CancelSaleModal
+from "../components/caixa/CancelSaleModal";
+
+import {
+  registrarVenda
+} from "../services/vendaService";
+
+import TrocoModal
+from "../components/caixa/TrocoModal";
 
 function formatCurrency(value) {
   return value.toLocaleString("pt-BR", {
@@ -19,79 +35,250 @@ function formatCurrency(value) {
   });
 }
 
-function CartIcon() {
-  return (
-    <svg viewBox="0 0 24 24" role="presentation">
-      <path d="M3 5h2l2.1 9.2a1 1 0 0 0 .98.8H18a1 1 0 0 0 .96-.73L21 7H7" />
-      <circle cx="9" cy="19" r="1.5" />
-      <circle cx="17" cy="19" r="1.5" />
-    </svg>
-  );
+export default function Caixa() {
+  const [query, setQuery] = useState("");
+  const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
+  const [confirmarCancelamento,
+  setConfirmarCancelamento] =
+    useState(false);
+  const [paymentMethod,
+  setPaymentMethod] =
+    useState("");
+  const [quantidadeDigitada,
+  setQuantidadeDigitada] =
+    useState(1);
+
+const [modalClienteAberto,
+  setModalClienteAberto] =
+    useState(false);
+  
+  useEffect(() => {
+  carregarProdutos();
+    carregarClientes();
+
+}, []);
+
+const [confirmarVenda,
+  setConfirmarVenda] =
+    useState(false);
+
+    const [clientes,
+  setClientes] =
+    useState([]);
+
+const [clienteSelecionado,
+  setClienteSelecionado] =
+    useState(null);
+
+  const [modalTrocoAberto,
+  setModalTrocoAberto] =
+    useState(false);
+
+    const [loadingVenda,
+  setLoadingVenda] =
+    useState(false);
+
+    const carregarClientes =
+  async () => {
+
+    try {
+
+      const response =
+        await listarClientes();
+
+      setClientes(response);
+
+    } catch (error) {
+
+      toast.error(
+        "Erro ao carregar clientes"
+      );
+    }
+  };
+
+async function carregarProdutos() {
+
+  try {
+
+    const response =
+      await listarProdutos();
+
+    setProducts(response);
+
+  } catch (error) {
+
+    console.error(
+      "Erro ao carregar produtos",
+      error
+    );
+  }
 }
 
-export default function Caixa() {
-  const [selectedCategory, setSelectedCategory] = useState("Todos");
-  const [query, setQuery] = useState("");
-  const [cart, setCart] = useState([]);
+function interpretarBusca(valor) {
 
-  const filteredProducts = products.filter((product) => {
-    if (query.trim() === "" && selectedCategory === "Todos") {
-      return product.favorite;
+  const texto =
+    valor.trim().toLowerCase();
+
+  let quantidade = 1;
+
+  let busca = texto;
+
+  if (texto.includes("*")) {
+
+    const partes =
+      texto.split("*");
+
+    const qtd =
+      parseInt(partes[0], 10);
+
+    if (
+      !isNaN(qtd) &&
+      qtd > 0
+    ) {
+
+      quantidade = qtd;
+
+      busca =
+        partes[1] ?? "";
+    }
+  }
+
+  return {
+    quantidade,
+    busca
+  };
+}
+
+const filteredProducts =
+  products.filter((product) => {
+
+const {
+  busca
+} = interpretarBusca(query);
+
+    if (!busca) {
+      return product.favorito === true;
     }
 
-    const matchesCategory =
-      selectedCategory === "Todos" || product.category === selectedCategory;
-    
-    const matchesSearch = 
-      product.name.toLowerCase().includes(query.trim().toLowerCase()) ||
-      product.barcode === query.trim();
-
-    return matchesCategory && matchesSearch;
+    return (
+      product.nome
+        ?.toLowerCase()
+        .includes(busca)
+      ||
+      product.codigoBarras
+        ?.includes(busca)
+    );
   });
 
-  const addToCart = (product, qty = 1) => {
-    setCart((current) => {
-      const existing = current.find((item) => item.id === product.id);
+const addToCart = (
+  product,
+  quantity = 1
+) => {
 
-      if (existing) {
-        return current.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + qty } : item
-        );
-      }
+  const itemExistente =
+    cart.find(
+      (item) =>
+        item.id === product.id
+    );
 
-      return [...current, { ...product, quantity: qty }];
-    });
-  };
+  const quantidadeAtual =
+    itemExistente?.quantity ?? 0;
 
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      
-      const searchStr = query.trim().toLowerCase();
-      if (!searchStr) return;
+  const novaQuantidade =
+    quantidadeAtual + quantity;
 
-      let qty = 1;
-      let code = searchStr;
+  const estoqueDisponivel =
+    Number(
+      product.quantidadeAtual ?? 0
+    );
 
-      if (searchStr.includes("x")) {
-        const parts = searchStr.split("x");
-        const parsedQty = parseInt(parts[0], 10);
-        if (!isNaN(parsedQty) && parsedQty > 0) {
-          qty = parsedQty;
-          code = parts[1];
-        }
-      }
+  if (
+    novaQuantidade >
+    estoqueDisponivel
+  ) {
 
-      const product = products.find(p => p.barcode === code || p.name.toLowerCase() === code);
+    alert(
+      `Estoque insuficiente.
+Disponível: ${estoqueDisponivel}`
+    );
 
-      if (product) {
-        addToCart(product, qty);
-        setQuery("");
-      } else {
-        alert("Produto não encontrado!");
-      }
+    return;
+  }
+
+  if (itemExistente) {
+
+    setCart((current) =>
+      current.map((item) =>
+        item.id === product.id
+          ? {
+              ...item,
+              quantity:
+                novaQuantidade
+            }
+          : item
+      )
+    );
+
+    return;
+  }
+
+  setCart((current) => [
+    ...current,
+    {
+      ...product,
+      quantity
     }
-  };
+  ]);
+};
+
+const handleKeyDown = (
+  event
+) => {
+
+  if (event.key !== "Enter") {
+    return;
+  }
+
+  event.preventDefault();
+
+  const {
+    quantidade,
+    busca
+  } = interpretarBusca(query);
+
+  if (!busca) {
+    return;
+  }
+
+  const produto =
+    products.find(
+      (p) =>
+        p.codigoBarras === busca
+        ||
+        p.nome
+          ?.toLowerCase()
+          === busca
+    );
+
+  if (produto) {
+
+    addToCart(
+      produto,
+      quantidade
+    );
+
+    setQuery("");
+
+    setQuantidadeDigitada(1);
+
+  } else {
+
+    alert(
+      "Produto não encontrado!"
+    );
+  }
+};
 
   const removeFromCart = (id) => {
     setCart((current) => current.filter((item) => item.id !== id));
@@ -101,123 +288,444 @@ export default function Caixa() {
     setCart([]);
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + item.preco * item.quantity, 0);
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  return (
-    <main className="caixa-page">
-      <section className="caixa-products">
-        <header className="caixa-header">
-          <h1>Caixa (PDV)</h1>
-        </header>
+  useEffect(() => {
 
-        <label className="pdv-search" aria-label="Buscar produto">
-          <span className="pdv-search-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" role="presentation">
-              <path d="M10.5 4a6.5 6.5 0 1 0 4.03 11.6l4.43 4.43 1.41-1.41-4.43-4.43A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z" />
-            </svg>
-          </span>
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Buscar produto ou bipar código de barras..."
-            type="search"
-          />
-        </label>
+  function atalhosPDV(event) {
 
-        <div className="pdv-filter-list" aria-label="Categorias">
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={`pdv-filter${selectedCategory === category ? " is-selected" : ""}`}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+    if (event.key === "F5"   && !loadingVenda) {
 
-        <div className="product-grid">
-          {filteredProducts.map((product) => (
-            <button
-              key={product.id}
-              type="button"
-              className="product-card"
-              onClick={() => addToCart(product)}
-            >
-              <strong>{product.name}</strong>
-              <span>{product.category}</span>
-              <em>{formatCurrency(product.price)}</em>
-            </button>
-          ))}
-        </div>
-      </section>
+  event.preventDefault();
 
-      <aside className="cart-panel">
-        <header className="cart-header">
-          <div className="cart-title">
-            <span className="cart-title-icon" aria-hidden="true">
-              <CartIcon />
-            </span>
-            <h2>Carrinho</h2>
-          </div>
-          <span>{itemCount} Itens</span>
-        </header>
+  setConfirmarVenda(true);
+}
 
-        <div className={`cart-body${cart.length ? " has-items" : ""}`}>
-          {cart.length === 0 ? (
-            <p>Adicione produtos ao carrinho</p>
-          ) : (
-            cart.map((item) => (
-              <div className="cart-item" key={item.id}>
-                <div>
-                  <strong>{item.name}</strong>
-                  <span>
-                    {item.quantity} x {formatCurrency(item.price)}
-                  </span>
-                </div>
-                <div className="cart-item-actions">
-                  <b>{formatCurrency(item.price * item.quantity)}</b>
-                  <button
-                    type="button"
-                    className="remove-cart-item"
-                    onClick={() => removeFromCart(item.id)}
-                    aria-label={`Remover ${item.name} do carrinho`}
-                  >
-                    Excluir
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+    if (event.key === "F7") {
 
-        <div className="payment-panel">
-          {cart.length > 0 && (
-            <button type="button" className="cancel-sale-button" onClick={clearCart}>
-              Cancelar Venda
-            </button>
-          )}
+  event.preventDefault();
 
-          <div className="payment-grid">
-            <button type="button">Dinheiro</button>
-            <button type="button">Pix</button>
-            <button type="button">Débito</button>
-            <button type="button">Crédito</button>
-          </div>
+  setModalClienteAberto(true);
 
-          <div className="cart-total">
-            <span>Total</span>
-            <strong>{formatCurrency(total)}</strong>
-          </div>
+  return;
+}
 
-          <button type="button" className="finish-sale-button">
-            Finalizar Venda
-          </button>
-        </div>
-      </aside>
-    </main>
+    if (event.key === "F8") {
+
+      event.preventDefault();
+
+      selecionarPagamento(
+        "DINHEIRO"
+      );
+    }
+
+if (event.key === "F9") {
+
+  event.preventDefault();
+
+  selecionarPagamento(
+    "PIX"
   );
+}
+
+if (event.key === "F10") {
+
+  event.preventDefault();
+
+  selecionarPagamento(
+    "DEBITO"
+  );
+}
+
+if (event.key === "F11") {
+
+  event.preventDefault();
+
+  selecionarPagamento(
+    "CREDITO"
+  );
+}
+
+if (event.key === "F12") {
+
+  event.preventDefault();
+
+  selecionarPagamento(
+    "FIADO"
+  );
+}
+
+if (event.key === "Escape") {
+
+  event.preventDefault();
+
+  if (confirmarVenda   &&  !loadingVenda) {
+
+    setConfirmarVenda(false);
+
+    return;
+  }
+
+  if (confirmarCancelamento) {
+
+    setConfirmarCancelamento(false);
+
+    return;
+  }
+
+  if (cart.length > 0) {
+
+    setConfirmarCancelamento(true);
+  }
+}
+
+if (event.key === "Enter") {
+
+  if (confirmarVenda) {
+
+    event.preventDefault();
+
+    confirmarVendaPDV();
+
+    return;
+  }
+
+  if (confirmarCancelamento) {
+
+    event.preventDefault();
+
+    clearCart();
+
+    setPaymentMethod("");
+
+    setClienteSelecionado(null);
+
+    setConfirmarCancelamento(false);
+
+    toast.success(
+      "Venda cancelada."
+    );
+
+    return;
+  }
+}
+  }
+
+  window.addEventListener(
+    "keydown",
+    atalhosPDV
+  );
+
+  return () => {
+
+    window.removeEventListener(
+      "keydown",
+      atalhosPDV
+    );
+  };
+
+}, [
+  confirmarVenda,
+  confirmarCancelamento,
+  cart,
+  paymentMethod,
+  clienteSelecionado,
+  loadingVenda
+]);
+
+
+async function confirmarVendaPDV() {
+
+  setConfirmarVenda(false);
+
+  if (
+    paymentMethod === "DINHEIRO"
+  ) {
+
+    setModalTrocoAberto(true);
+
+    return;
+  }
+
+  await finalizarVenda();
+}
+
+function selecionarPagamento(tipo) {
+
+  if (
+    tipo === "FIADO" &&
+    !clienteSelecionado
+  ) {
+
+    alert(
+      "Selecione um cliente para vendas fiado."
+    );
+
+    return;
+  }
+
+  setPaymentMethod(tipo);
+}
+
+const finalizarVenda = async () => {
+
+  if (loadingVenda) {
+  return;
+}
+
+  if (cart.length === 0) {
+
+    alert(
+      "Adicione itens no carrinho"
+    );
+
+    return;
+  }
+
+  if (!paymentMethod) {
+
+    alert(
+      "Selecione uma forma de pagamento"
+    );
+
+    return;
+  }
+
+  if (
+    paymentMethod === "FIADO"
+    &&
+    !clienteSelecionado
+  ) {
+
+    alert(
+      "Selecione um cliente para venda fiado"
+    );
+
+    return;
+  }
+
+  setLoadingVenda(true);
+
+  try {
+
+const payload = {
+
+  idCliente:
+    clienteSelecionado?.idCliente
+    || null,
+
+  idFuncionario: null,
+
+  tipoPagamento:
+    paymentMethod,
+
+  products: cart.map(
+    (item) => ({
+      id: item.id,
+      quantidade: item.quantity
+    })
+  )
+};
+
+    const venda =
+      await registrarVenda(
+        payload
+      );
+
+    alert(
+      "Venda realizada com sucesso!"
+    );
+
+    setCart([]);
+
+    setPaymentMethod("");
+
+    setClienteSelecionado(
+      null
+    );
+
+    carregarProdutos();
+
+  } catch (error) {
+
+    console.error(error);
+
+    const mensagem =
+      error.response?.data
+      ||
+      "Erro ao finalizar venda";
+
+    alert(mensagem);
+  } finally {
+
+  setLoadingVenda(false);
+}
+};
+
+return (
+  <main className="caixa-page">
+
+    <section className="caixa-products">
+
+      <header className="caixa-header">
+        <h1>Caixa (PDV)</h1>
+      </header>
+
+<label
+  className="pdv-search"
+  aria-label="Buscar produto"
+>
+
+  <span
+    className="pdv-search-icon"
+    aria-hidden="true"
+  >
+    <svg viewBox="0 0 24 24">
+      <path d="m21 21-4.3-4.3" />
+      <circle
+        cx="11"
+        cy="11"
+        r="7"
+      />
+    </svg>
+  </span>
+
+  <input
+    type="text"
+    placeholder="
+Buscar produto ou bipar código de barras...
+    "
+    value={query}
+    onChange={(event) =>
+      setQuery(
+        event.target.value
+      )
+    }
+    onKeyDown={handleKeyDown}
+    autoFocus
+  />
+
+</label>
+
+      <ProductGrid
+        products={filteredProducts}
+        onAdd={(product) => {
+
+          const {
+            quantidade
+          } = interpretarBusca(query);
+
+          addToCart(
+            product,
+            quantidade
+          );
+
+          setQuery("");
+        }}
+        formatCurrency={
+          formatCurrency
+        }
+      />
+
+    </section>
+
+    <CartPanel
+      cart={cart}
+      itemCount={itemCount}
+      clienteSelecionado={
+        clienteSelecionado
+      }
+      setModalClienteAberto={
+        setModalClienteAberto
+      }
+      removeFromCart={
+        removeFromCart
+      }
+      paymentMethod={
+        paymentMethod
+      }
+      selecionarPagamento={
+        selecionarPagamento
+      }
+      setConfirmarCancelamento={
+        setConfirmarCancelamento
+      }
+      total={total}
+      finalizarVenda={() =>
+        setConfirmarVenda(true)
+      }
+      formatCurrency={
+        formatCurrency
+      }
+      loadingVenda={
+  loadingVenda
+}
+    />
+
+<ClientePDVModal
+  show={modalClienteAberto}
+  clientes={clientes}
+  onClose={() =>
+    setModalClienteAberto(false)
+  }
+  onSelect={(cliente) => {
+
+    setClienteSelecionado(
+      cliente
+    );
+
+    setModalClienteAberto(false);
+  }}
+/>
+
+<ConfirmSaleModal
+  show={confirmarVenda}
+  onClose={() =>
+    setConfirmarVenda(false)
+  }
+  onConfirm={
+    confirmarVendaPDV
+  }
+/>
+
+<CancelSaleModal
+  show={
+    confirmarCancelamento
+  }
+  onClose={() =>
+    setConfirmarCancelamento(false)
+  }
+  onConfirm={() => {
+
+    clearCart();
+
+    setPaymentMethod("");
+
+    setClienteSelecionado(null);
+
+    setConfirmarCancelamento(false);
+
+    toast.success(
+      "Venda cancelada."
+    );
+  }}
+/>
+
+<TrocoModal
+  show={modalTrocoAberto}
+  total={total}
+  onClose={() =>
+    setModalTrocoAberto(false)
+  }
+  onConfirm={async () => {
+
+    setModalTrocoAberto(false);
+
+    await finalizarVenda();
+  }}
+/>
+
+  </main>
+);
 }
