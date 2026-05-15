@@ -11,7 +11,7 @@ export default function Chatbot() {
       <div className="iframe-wrapper">
         <iframe
           title="Dashboard PãoFresquim"
-          src="https://app.powerbi.com/reportEmbed?reportId=153aa935-c47d-4e49-88fa-3bbbe9ecd7fd&autoAuth=true"
+          src="https://app.powerbi.com/reportEmbed?reportId=5e08f0eb-d30f-4fe5-b904-8ae389cc2dd9&autoAuth=true"
           frameBorder="0"
           allowFullScreen={true}
         ></iframe>
