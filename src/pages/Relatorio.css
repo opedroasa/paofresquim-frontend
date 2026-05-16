@@ -43,7 +43,8 @@
   padding: 20px;
   border-radius: 12px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns:
+  repeat(auto-fit, minmax(220px, 1fr));
   gap: 15px;
   align-items: end;
   margin-bottom: 25px;
@@ -143,37 +144,6 @@
 .grafico-header p {
   color: #777;
   font-size: 14px;
-}
-
-.grafico-barras {
-  height: 260px;
-  display: flex;
-  align-items: end;
-  gap: 35px;
-  padding: 25px 10px 0;
-  border-bottom: 2px solid #ddd;
-}
-
-.barra {
-  width: 60px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  align-items: center;
-}
-
-.barra span {
-  width: 100%;
-  background-color: #ff9900;
-  border-radius: 8px 8px 0 0;
-  display: block;
-}
-
-.barra p {
-  margin-top: 8px;
-  font-weight: bold;
-  color: #3b2a1a;
 }
 
 .historico-relatorios {
