@@ -451,22 +451,36 @@ async function confirmarVendaPDV() {
   await finalizarVenda();
 }
 
-function selecionarPagamento(tipo) {
+const selecionarPagamento =
+  (tipo) => {
 
-  if (
-    tipo === "FIADO" &&
-    !clienteSelecionado
-  ) {
+    if (
 
-    alert(
-      "Selecione um cliente para vendas fiado."
-    );
+      tipo === "FIADO"
 
-    return;
-  }
+      &&
 
-  setPaymentMethod(tipo);
-}
+      clienteSelecionado
+
+      &&
+
+      clienteSelecionado
+        .statusCredito
+        ?.toUpperCase()
+        !==
+        "ATIVO"
+
+    ) {
+
+      toast.error(
+        "Cliente sem crédito para venda fiado."
+      );
+
+      return;
+    }
+
+    setPaymentMethod(tipo);
+  };
 
 const finalizarVenda = async () => {
 
