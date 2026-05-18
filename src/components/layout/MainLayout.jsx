@@ -34,7 +34,10 @@ export default function MainLayout() {
         <Sidebar activePage={activePage} onNavigate={setActivePage} />
 
         {}
-        {pages[activePage]}
+        <div className="content-area">
+          {pages[activePage]}
+        </div>
+        
       </div>
     </div>
   );
