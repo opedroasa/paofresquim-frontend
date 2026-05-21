@@ -141,16 +141,29 @@ const carregarProdutos = async () => {
     setShowModal(true);
   };
 
-  const abrirEditarProduto = (produto) => {
-    setProdutoEditando(produto);
+const abrirEditarProduto = (produto) => {
 
-    setFormData({
-      ...formularioVazio,
-      ...produto,
-    });
+  setProdutoEditando(produto);
 
-    setShowModal(true);
-  };
+  setFormData({
+
+    ...formularioVazio,
+
+    ...produto,
+
+    preco:
+      produto.preco
+        ? String(
+            Math.round(
+              Number(produto.preco) * 100
+            )
+          )
+        : ""
+
+  });
+
+  setShowModal(true);
+};
 
   const fecharModal = () => {
     setShowModal(false);
